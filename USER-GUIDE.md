@@ -30,6 +30,26 @@
 21. [Xem kết quả & Debug lỗi](#21-xem-kết-quả--debug-lỗi)
 22. [CI/CD Integration](#22-cicd-integration)
 
+### v2.0 - Skills mới
+
+23. [Test API / REST Endpoint](#23-test-api--rest-endpoint)
+24. [Test Unit (Vitest / Jest)](#24-test-unit-vitest--jest)
+25. [Test Database](#25-test-database)
+26. [Test với Cypress](#26-test-với-cypress)
+27. [Test Flutter App](#27-test-flutter-app)
+28. [Test React Native App](#28-test-react-native-app)
+29. [Visual Regression Testing](#29-visual-regression-testing)
+30. [Contract Testing (Pact)](#30-contract-testing-pact)
+31. [Smoke Test sau Deploy](#31-smoke-test-sau-deploy)
+32. [Security Testing](#32-security-testing)
+33. [Accessibility Testing (WCAG)](#33-accessibility-testing-wcag)
+34. [Lighthouse Audit](#34-lighthouse-audit)
+35. [Generate CI/CD Pipeline](#35-generate-cicd-pipeline)
+36. [Docker Test Environment](#36-docker-test-environment)
+37. [Gửi Notification](#37-gửi-notification)
+38. [Quản lý Test Data](#38-quản-lý-test-data)
+39. [Cheat Sheet đầy đủ (v2.0)](#cheat-sheet-đầy-đủ-v20)
+
 ---
 
 ## 1. Chuẩn bị môi trường
@@ -2181,19 +2201,929 @@ claude -p "run /setup-test-env && /run-test && /test-report"
 
 ---
 
-## Cheat Sheet - Skill nào cho chức năng nào?
+## 23. Test API / REST Endpoint
 
-| Tôi muốn test... | Dùng skill | Lệnh ví dụ |
+### Skill: `/api-test`
+
+Test các API endpoints của backend. Hỗ trợ Playwright request API, Supertest, và Newman (Postman).
+
+### Bước 1: Tạo file test API
+
+```typescript
+// tests/api/users.api.ts
+import { test, expect } from '@playwright/test';
+
+test.describe('Users API', () => {
+  const BASE_URL = process.env.API_URL || 'http://localhost:3000/api';
+
+  test('GET /users - lấy danh sách users', async ({ request }) => {
+    const response = await request.get(`${BASE_URL}/users`);
+    expect(response.ok()).toBeTruthy();
+    const users = await response.json();
+    expect(users).toBeInstanceOf(Array);
+    expect(users.length).toBeGreaterThan(0);
+  });
+
+  test('POST /users - tạo user mới', async ({ request }) => {
+    const newUser = {
+      name: 'Test User',
+      email: `test-${Date.now()}@example.com`,
+      password: 'SecurePass123!'
+    };
+    const response = await request.post(`${BASE_URL}/users`, { data: newUser });
+    expect(response.status()).toBe(201);
+    const user = await response.json();
+    expect(user.name).toBe(newUser.name);
+    expect(user.email).toBe(newUser.email);
+    expect(user).not.toHaveProperty('password'); // password không nên trả về
+  });
+
+  test('GET /users/:id - lấy user theo ID', async ({ request }) => {
+    const response = await request.get(`${BASE_URL}/users/1`);
+    expect(response.ok()).toBeTruthy();
+    const user = await response.json();
+    expect(user.id).toBe(1);
+  });
+
+  test('PUT /users/:id - cập nhật user', async ({ request }) => {
+    const response = await request.put(`${BASE_URL}/users/1`, {
+      data: { name: 'Updated Name' }
+    });
+    expect(response.ok()).toBeTruthy();
+    const user = await response.json();
+    expect(user.name).toBe('Updated Name');
+  });
+
+  test('DELETE /users/:id - xóa user', async ({ request }) => {
+    const response = await request.delete(`${BASE_URL}/users/99`);
+    expect(response.status()).toBe(200);
+  });
+
+  test('POST /auth/login - authentication', async ({ request }) => {
+    const response = await request.post(`${BASE_URL}/auth/login`, {
+      data: { email: 'admin@example.com', password: 'admin123' }
+    });
+    expect(response.ok()).toBeTruthy();
+    const data = await response.json();
+    expect(data.token).toBeTruthy();
+  });
+
+  test('GET /users - with auth token', async ({ request }) => {
+    // Login first
+    const loginRes = await request.post(`${BASE_URL}/auth/login`, {
+      data: { email: 'admin@example.com', password: 'admin123' }
+    });
+    const { token } = await loginRes.json();
+
+    // Use token
+    const response = await request.get(`${BASE_URL}/users`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    expect(response.ok()).toBeTruthy();
+  });
+});
+```
+
+### Bước 2: Chạy test
+
+```
+> /api-test tests/api/users.api.ts
+> /api-test tests/api/users.api.ts --base-url https://staging.api.com
+> /api-test tests/api/ --env staging --verbose
+> /api-test collection.postman.json              # Chạy Postman collection
+```
+
+### Kết quả mong đợi
+
+```
+API Test Results
+══════════════════════════════════════════════
+  ✓ GET /users - lấy danh sách users           (120ms)
+  ✓ POST /users - tạo user mới                 (250ms)
+  ✓ GET /users/:id - lấy user theo ID          (80ms)
+  ✓ PUT /users/:id - cập nhật user             (150ms)
+  ✓ DELETE /users/:id - xóa user               (90ms)
+  ✓ POST /auth/login - authentication          (200ms)
+  ✓ GET /users - with auth token               (130ms)
+══════════════════════════════════════════════
+7 passed, 0 failed (1.02s)
+```
+
+---
+
+## 24. Test Unit (Vitest / Jest)
+
+### Skill: `/unit-test`
+
+Test functions, classes, hooks riêng lẻ. Auto-detect Vitest hoặc Jest.
+
+### Bước 1: Tạo file test
+
+```typescript
+// src/utils/math.test.ts
+import { describe, it, expect } from 'vitest';
+import { add, multiply, divide, factorial } from './math';
+
+describe('Math Utils', () => {
+  it('add: cộng 2 số', () => {
+    expect(add(2, 3)).toBe(5);
+    expect(add(-1, 1)).toBe(0);
+    expect(add(0, 0)).toBe(0);
+  });
+
+  it('multiply: nhân 2 số', () => {
+    expect(multiply(3, 4)).toBe(12);
+    expect(multiply(-2, 5)).toBe(-10);
+    expect(multiply(0, 100)).toBe(0);
+  });
+
+  it('divide: chia 2 số', () => {
+    expect(divide(10, 2)).toBe(5);
+    expect(divide(7, 3)).toBeCloseTo(2.333);
+  });
+
+  it('divide: chia cho 0 throw error', () => {
+    expect(() => divide(10, 0)).toThrow('Division by zero');
+  });
+
+  it('factorial: tính giai thừa', () => {
+    expect(factorial(0)).toBe(1);
+    expect(factorial(1)).toBe(1);
+    expect(factorial(5)).toBe(120);
+    expect(factorial(10)).toBe(3628800);
+  });
+});
+```
+
+### Bước 2: Chạy test
+
+```
+> /unit-test                                   # Chạy tất cả
+> /unit-test src/utils/math.test.ts            # File cụ thể
+> /unit-test --coverage                        # Kèm coverage report
+> /unit-test --watch                           # Watch mode
+> /unit-test --bail                            # Dừng khi gặp lỗi đầu tiên
+```
+
+### Kết quả mong đợi
+
+```
+Unit Test Results (Vitest)
+══════════════════════════════════════════════
+ ✓ Math Utils
+   ✓ add: cộng 2 số                           (2ms)
+   ✓ multiply: nhân 2 số                      (1ms)
+   ✓ divide: chia 2 số                        (1ms)
+   ✓ divide: chia cho 0 throw error           (1ms)
+   ✓ factorial: tính giai thừa                (1ms)
+
+Tests:   5 passed
+Time:    45ms
+
+Coverage (--coverage):
+  Statements: 95.2%
+  Branches:   88.0%
+  Functions:  100%
+  Lines:      94.5%
+```
+
+---
+
+## 25. Test Database
+
+### Skill: `/db-test`
+
+Test database queries, migrations, relationships.
+
+### Ví dụ file test
+
+```typescript
+// tests/db/users.db.test.ts
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
+describe('User DB Operations', () => {
+  beforeAll(async () => {
+    await prisma.$connect();
+  });
+
+  afterAll(async () => {
+    // Cleanup test data
+    await prisma.user.deleteMany({ where: { email: { contains: '@test.com' } } });
+    await prisma.$disconnect();
+  });
+
+  it('tạo user mới', async () => {
+    const user = await prisma.user.create({
+      data: { name: 'DB Test', email: `dbtest-${Date.now()}@test.com` }
+    });
+    expect(user.id).toBeDefined();
+    expect(user.name).toBe('DB Test');
+  });
+
+  it('query user theo email', async () => {
+    const user = await prisma.user.findUnique({
+      where: { email: 'admin@example.com' }
+    });
+    expect(user).not.toBeNull();
+    expect(user?.name).toBeTruthy();
+  });
+
+  it('update user', async () => {
+    const user = await prisma.user.create({
+      data: { name: 'Before', email: `update-${Date.now()}@test.com` }
+    });
+    const updated = await prisma.user.update({
+      where: { id: user.id },
+      data: { name: 'After' }
+    });
+    expect(updated.name).toBe('After');
+  });
+});
+```
+
+### Chạy test
+
+```
+> /db-test                                     # Chạy tất cả DB tests
+> /db-test tests/db/users.db.test.ts           # File cụ thể
+> /db-test --reset --seed                      # Reset DB + seed trước khi test
+```
+
+---
+
+## 26. Test với Cypress
+
+### Skill: `/cypress-test`
+
+Dùng cho projects đã có Cypress thay vì Playwright.
+
+### Ví dụ file test
+
+```typescript
+// cypress/e2e/login.cy.ts
+describe('Login Page', () => {
+  beforeEach(() => {
+    cy.visit('/login');
+  });
+
+  it('hiển thị form login', () => {
+    cy.get('[data-cy=email]').should('be.visible');
+    cy.get('[data-cy=password]').should('be.visible');
+    cy.get('[data-cy=submit]').should('contain', 'Login');
+  });
+
+  it('login thành công', () => {
+    cy.get('[data-cy=email]').type('admin@example.com');
+    cy.get('[data-cy=password]').type('admin123');
+    cy.get('[data-cy=submit]').click();
+    cy.url().should('include', '/dashboard');
+    cy.get('[data-cy=welcome]').should('contain', 'Welcome');
+  });
+
+  it('login thất bại - sai password', () => {
+    cy.get('[data-cy=email]').type('admin@example.com');
+    cy.get('[data-cy=password]').type('wrongpassword');
+    cy.get('[data-cy=submit]').click();
+    cy.get('[data-cy=error]').should('contain', 'Invalid credentials');
+  });
+
+  it('redirect khi chưa login', () => {
+    cy.visit('/dashboard');
+    cy.url().should('include', '/login');
+  });
+});
+```
+
+### Chạy test
+
+```
+> /cypress-test                                # Tất cả E2E tests
+> /cypress-test login.cy.ts                    # File cụ thể
+> /cypress-test --headed --browser chrome      # Xem browser
+> /cypress-test --component                    # Component tests
+```
+
+---
+
+## 27. Test Flutter App
+
+### Skill: `/flutter-test`
+
+Dành cho Flutter projects - test unit, widget, integration.
+
+### Ví dụ file test
+
+```dart
+// test/widget/counter_test.dart
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:my_app/main.dart';
+
+void main() {
+  testWidgets('Counter tăng khi nhấn nút +', (WidgetTester tester) async {
+    await tester.pumpWidget(const MyApp());
+
+    // Verify initial count
+    expect(find.text('0'), findsOneWidget);
+    expect(find.text('1'), findsNothing);
+
+    // Tap + button
+    await tester.tap(find.byIcon(Icons.add));
+    await tester.pump();
+
+    // Verify count increased
+    expect(find.text('0'), findsNothing);
+    expect(find.text('1'), findsOneWidget);
+  });
+
+  testWidgets('Counter giảm khi nhấn nút -', (WidgetTester tester) async {
+    await tester.pumpWidget(const MyApp());
+
+    await tester.tap(find.byIcon(Icons.remove));
+    await tester.pump();
+
+    expect(find.text('-1'), findsOneWidget);
+  });
+}
+```
+
+### Chạy test
+
+```
+> /flutter-test                                # Tất cả unit/widget tests
+> /flutter-test test/widget/counter_test.dart  # File cụ thể
+> /flutter-test --integration                  # Integration tests trên device
+> /flutter-test --coverage                     # Kèm coverage
+> /flutter-test --update-goldens               # Cập nhật golden images
+```
+
+---
+
+## 28. Test React Native App
+
+### Skill: `/rn-test`
+
+Test React Native app - Jest cho unit, Detox cho E2E.
+
+### Unit test (Jest)
+
+```typescript
+// __tests__/App.test.tsx
+import React from 'react';
+import { render, fireEvent } from '@testing-library/react-native';
+import LoginScreen from '../src/screens/LoginScreen';
+
+describe('LoginScreen', () => {
+  it('render form login', () => {
+    const { getByPlaceholderText, getByText } = render(<LoginScreen />);
+    expect(getByPlaceholderText('Email')).toBeTruthy();
+    expect(getByPlaceholderText('Password')).toBeTruthy();
+    expect(getByText('Login')).toBeTruthy();
+  });
+
+  it('validate email rỗng', () => {
+    const { getByText } = render(<LoginScreen />);
+    fireEvent.press(getByText('Login'));
+    expect(getByText('Email is required')).toBeTruthy();
+  });
+});
+```
+
+### E2E test (Detox)
+
+```typescript
+// e2e/login.e2e.ts
+describe('Login Flow', () => {
+  beforeAll(async () => {
+    await device.launchApp();
+  });
+
+  it('login thành công', async () => {
+    await element(by.id('email-input')).typeText('admin@example.com');
+    await element(by.id('password-input')).typeText('admin123');
+    await element(by.id('login-button')).tap();
+    await expect(element(by.id('dashboard-screen'))).toBeVisible();
+  });
+});
+```
+
+### Chạy test
+
+```
+> /rn-test                                     # Jest unit tests
+> /rn-test --e2e                               # Detox E2E tests
+> /rn-test --e2e --build --platform android    # Build trước rồi E2E
+```
+
+---
+
+## 29. Visual Regression Testing
+
+### Skill: `/visual-test`
+
+So sánh screenshots với baseline để phát hiện thay đổi UI ngoài ý muốn.
+
+### Ví dụ file test
+
+```typescript
+// tests/visual/homepage.visual.ts
+import { test, expect } from '@playwright/test';
+
+test.describe('Visual Regression', () => {
+  test('homepage - desktop', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+    await expect(page).toHaveScreenshot('homepage-desktop.png', {
+      fullPage: true,
+      maxDiffPixelRatio: 0.1,
+    });
+  });
+
+  test('homepage - mobile', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto('/');
+    await expect(page).toHaveScreenshot('homepage-mobile.png');
+  });
+
+  test('login page', async ({ page }) => {
+    await page.goto('/login');
+    await expect(page).toHaveScreenshot('login-page.png');
+  });
+});
+```
+
+### Chạy test
+
+```
+> /visual-test --update                        # Tạo baseline lần đầu
+> /visual-test                                 # So sánh với baseline
+> /visual-test --threshold 0.05               # Chặt hơn (5% sai khác)
+> /visual-test homepage.visual.ts              # File cụ thể
+```
+
+### Khi có thay đổi
+
+Nếu test fail do UI thay đổi **có chủ ý**, update baseline:
+```
+> /visual-test --update
+```
+
+---
+
+## 30. Contract Testing (Pact)
+
+### Skill: `/contract-test`
+
+Verify API giữa 2 services tương thích nhau (consumer-driven contracts).
+
+### Ví dụ consumer test
+
+```typescript
+// tests/contracts/user-service.pact.ts
+import { PactV3, MatchersV3 } from '@pact-foundation/pact';
+
+const { like, eachLike } = MatchersV3;
+const provider = new PactV3({ consumer: 'WebApp', provider: 'UserService' });
+
+describe('User Service Contract', () => {
+  it('GET /users returns list', async () => {
+    provider
+      .given('users exist')
+      .uponReceiving('a request for users')
+      .withRequest({ method: 'GET', path: '/api/users' })
+      .willRespondWith({
+        status: 200,
+        body: eachLike({
+          id: like(1),
+          name: like('John'),
+          email: like('john@example.com'),
+        }),
+      });
+
+    await provider.executeTest(async (mockServer) => {
+      const response = await fetch(`${mockServer.url}/api/users`);
+      const users = await response.json();
+      expect(users[0]).toHaveProperty('id');
+      expect(users[0]).toHaveProperty('name');
+    });
+  });
+});
+```
+
+### Chạy test
+
+```
+> /contract-test                               # Consumer tests
+> /contract-test --provider                    # Provider verification
+> /contract-test --publish --broker-url https://pact.example.com
+```
+
+---
+
+## 31. Smoke Test sau Deploy
+
+### Skill: `/smoke-test`
+
+Quick tests sau deployment để verify critical paths hoạt động.
+
+### Ví dụ file test
+
+```typescript
+// tests/smoke/production.smoke.ts
+import { test, expect } from '@playwright/test';
+
+test.describe('Production Smoke Tests @smoke', () => {
+  test('homepage loads', async ({ request }) => {
+    const response = await request.get('/');
+    expect(response.status()).toBe(200);
+  });
+
+  test('login page accessible', async ({ request }) => {
+    const response = await request.get('/login');
+    expect(response.status()).toBe(200);
+  });
+
+  test('API health check', async ({ request }) => {
+    const response = await request.get('/api/health');
+    expect(response.ok()).toBeTruthy();
+    const data = await response.json();
+    expect(data.status).toBe('ok');
+  });
+
+  test('database connected', async ({ request }) => {
+    const response = await request.get('/api/health/db');
+    expect(response.ok()).toBeTruthy();
+  });
+
+  test('login flow works', async ({ page }) => {
+    await page.goto('/login');
+    await page.fill('[name=email]', 'smoke-test@example.com');
+    await page.fill('[name=password]', 'SmokeTest123!');
+    await page.click('[type=submit]');
+    await expect(page).toHaveURL(/dashboard/);
+  });
+});
+```
+
+### Chạy test
+
+```
+> /smoke-test                                  # Local smoke test
+> /smoke-test --env staging                    # Staging environment
+> /smoke-test --url https://prod.example.com   # Production
+> /smoke-test --env production --notify slack  # Test + gửi Slack
+```
+
+---
+
+## 32. Security Testing
+
+### Skill: `/security-test`
+
+Scan vulnerabilities, code security, OWASP Top 10.
+
+### Chạy test
+
+```
+> /security-test                               # Full scan (deps + code + OWASP)
+> /security-test deps                          # Chỉ scan dependencies
+> /security-test deps --fix                    # Auto-fix vulnerabilities
+> /security-test code                          # Phân tích code (XSS, SQL injection)
+> /security-test --severity high               # Chỉ hiện high/critical
+```
+
+### Kết quả mong đợi
+
+```
+Security Scan Results
+══════════════════════════════════════════════
+
+DEPENDENCY AUDIT (npm audit)
+  Total: 3 vulnerabilities
+  ┌──────────────────────┬──────────┬────────────────────────────┐
+  │ Package              │ Severity │ Issue                      │
+  ├──────────────────────┼──────────┼────────────────────────────┤
+  │ lodash@4.17.20       │ HIGH     │ Prototype Pollution        │
+  │ axios@0.21.0         │ MODERATE │ SSRF vulnerability         │
+  │ express@4.17.1       │ LOW      │ Open redirect              │
+  └──────────────────────┴──────────┴────────────────────────────┘
+  Fix available: Run /security-test deps --fix
+
+CODE ANALYSIS
+  ✓ No SQL injection patterns found
+  ✓ No XSS vulnerabilities detected
+  ⚠ 2 potential issues:
+    - src/api/users.ts:45 - Unsanitized user input in query
+    - src/utils/render.ts:12 - innerHTML usage
+
+══════════════════════════════════════════════
+```
+
+---
+
+## 33. Accessibility Testing (WCAG)
+
+### Skill: `/a11y-test`
+
+Kiểm tra accessibility theo chuẩn WCAG 2.2.
+
+### Ví dụ file test
+
+```typescript
+// tests/a11y/login.a11y.ts
+import { test, expect } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
+
+test.describe('Login Page Accessibility', () => {
+  test('no WCAG 2.2 AA violations', async ({ page }) => {
+    await page.goto('/login');
+
+    const results = await new AxeBuilder({ page })
+      .withTags(['wcag2aa', 'wcag22aa'])
+      .analyze();
+
+    expect(results.violations).toEqual([]);
+  });
+
+  test('form labels exist', async ({ page }) => {
+    await page.goto('/login');
+
+    const emailInput = page.locator('[name=email]');
+    const label = await emailInput.getAttribute('aria-label')
+      || await page.locator(`label[for="${await emailInput.getAttribute('id')}"]`).count();
+    expect(label).toBeTruthy();
+  });
+});
+```
+
+### Chạy test
+
+```
+> /a11y-test                                   # Tất cả a11y tests
+> /a11y-test https://localhost:3000            # Scan URL trực tiếp
+> /a11y-test --standard wcag2aaa               # Strict AAA level
+```
+
+### Kết quả mong đợi
+
+```
+Accessibility Results (WCAG 2.2 AA)
+══════════════════════════════════════════════
+  URL: http://localhost:3000/login
+
+  Violations: 2
+  ┌──────────────────────────┬──────────┬────────────────────────────────────┐
+  │ Rule                     │ Impact   │ Description                        │
+  ├──────────────────────────┼──────────┼────────────────────────────────────┤
+  │ color-contrast           │ serious  │ Text contrast ratio < 4.5:1       │
+  │ image-alt                │ critical │ Image missing alt attribute       │
+  └──────────────────────────┴──────────┴────────────────────────────────────┘
+
+  Passes: 45 rules passed
+  Incomplete: 3 need manual review
+══════════════════════════════════════════════
+```
+
+---
+
+## 34. Lighthouse Audit
+
+### Skill: `/lighthouse`
+
+Đánh giá performance, accessibility, SEO, best practices của website.
+
+### Chạy test
+
+```
+> /lighthouse https://example.com              # Full audit
+> /lighthouse https://example.com --device desktop
+> /lighthouse https://example.com --category performance
+> /lighthouse https://example.com --runs 3     # Lấy median score
+```
+
+### Kết quả mong đợi
+
+```
+Lighthouse Audit Results
+══════════════════════════════════════════════
+  URL: https://example.com
+  Device: Mobile
+
+  Scores:
+  ┌──────────────────┬───────┬────────┐
+  │ Category         │ Score │ Status │
+  ├──────────────────┼───────┼────────┤
+  │ Performance      │ 92    │ ✓      │
+  │ Accessibility    │ 98    │ ✓      │
+  │ Best Practices   │ 100   │ ✓      │
+  │ SEO              │ 95    │ ✓      │
+  └──────────────────┴───────┴────────┘
+
+  Core Web Vitals:
+  ┌────────────────────┬─────────┬────────┐
+  │ Metric             │ Value   │ Status │
+  ├────────────────────┼─────────┼────────┤
+  │ LCP                │ 1.2s    │ ✓ Good │
+  │ FID                │ 12ms    │ ✓ Good │
+  │ CLS                │ 0.05    │ ✓ Good │
+  │ FCP                │ 0.8s    │ ✓ Good │
+  │ TTFB               │ 0.3s    │ ✓ Good │
+  └────────────────────┴─────────┴────────┘
+══════════════════════════════════════════════
+```
+
+---
+
+## 35. Generate CI/CD Pipeline
+
+### Skill: `/ci-gen`
+
+Auto-generate pipeline configuration cho CI/CD platform.
+
+### Chạy
+
+```
+> /ci-gen github                               # GitHub Actions
+> /ci-gen gitlab                               # GitLab CI
+> /ci-gen jenkins                              # Jenkinsfile
+> /ci-gen azure                                # Azure Pipelines
+> /ci-gen github --features test,lint,build,deploy
+```
+
+### Kết quả
+
+Tự động tạo file pipeline dựa trên project hiện tại. Ví dụ cho GitHub:
+
+```yaml
+# .github/workflows/test.yml (auto-generated)
+name: Test
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm ci
+      - run: npx playwright install --with-deps
+      - run: npm test
+      - run: npx playwright test
+```
+
+---
+
+## 36. Docker Test Environment
+
+### Skill: `/docker-test`
+
+Quản lý Docker containers cho test environment (database, services...).
+
+### Chạy
+
+```
+> /docker-test up                              # Start test services
+> /docker-test up --build                      # Rebuild rồi start
+> /docker-test status                          # Xem services đang chạy
+> /docker-test run                             # Chạy tests trong container
+> /docker-test down                            # Stop tất cả
+```
+
+### Workflow ví dụ
+
+```
+> /docker-test up            # Start PostgreSQL + Redis test containers
+> /db-test --seed            # Seed test data
+> /api-test                  # Run API tests against Docker DB
+> /docker-test down          # Cleanup
+```
+
+---
+
+## 37. Gửi Notification
+
+### Skill: `/notify`
+
+Gửi test results tới team qua Slack, Teams, Discord, hoặc Email.
+
+### Chạy
+
+```
+> /notify slack                                # Gửi kết quả tới Slack
+> /notify teams                                # Microsoft Teams
+> /notify discord                              # Discord
+> /notify email                                # Email
+> /notify slack --webhook https://hooks.slack.com/...
+> /notify slack --message "Deploy v2.0 passed all tests!"
+```
+
+### Setup webhook
+
+Tạo file `notification-config.json`:
+
+```json
+{
+  "slack": {
+    "webhookUrl": "https://hooks.slack.com/services/YOUR/WEBHOOK/URL",
+    "channel": "#testing"
+  },
+  "teams": {
+    "webhookUrl": "https://outlook.office.com/webhook/YOUR/URL"
+  },
+  "discord": {
+    "webhookUrl": "https://discord.com/api/webhooks/YOUR/URL"
+  },
+  "email": {
+    "smtp": "smtp.gmail.com",
+    "from": "ci@yourcompany.com",
+    "to": ["team@yourcompany.com"]
+  }
+}
+```
+
+---
+
+## 38. Quản lý Test Data
+
+### Skill: `/test-data`
+
+Generate, seed, cleanup test data dùng Faker.js.
+
+### Chạy
+
+```
+> /test-data generate --schema user --count 50
+> /test-data generate --schema product --count 100 --format csv
+> /test-data generate --schema order --count 20 --format sql
+> /test-data seed                              # Seed vào database
+> /test-data cleanup                           # Xóa test data
+```
+
+### Kết quả mong đợi
+
+```
+Test Data Generated
+══════════════════════════════════════════════
+  Schema:  user
+  Count:   50
+  Format:  JSON
+  Output:  test-data/users.json
+
+  Sample record:
+  {
+    "id": 1,
+    "name": "John Smith",
+    "email": "john.smith@test.com",
+    "phone": "+1-555-0123",
+    "address": "123 Main St, New York, NY 10001",
+    "createdAt": "2026-01-15T10:30:00Z"
+  }
+══════════════════════════════════════════════
+```
+
+---
+
+## Cheat Sheet đầy đủ (v2.0)
+
+| Tôi muốn... | Dùng skill | Lệnh ví dụ |
 |---|---|---|
+| **Web Testing** | | |
 | Login web | `/run-test` | `/run-test tests/web/auth.spec.ts` |
 | Form validation web | `/run-test` | `/run-test tests/web/form-validation.spec.ts` |
 | Responsive web | `/run-test` | `/run-test tests/web/responsive.spec.ts --project=mobile-chrome` |
+| Web test bằng Cypress | `/cypress-test` | `/cypress-test login.cy.ts --headed` |
+| Visual regression | `/visual-test` | `/visual-test --update` (baseline), `/visual-test` (compare) |
+| **Mobile Testing** | | |
 | Cài APK lên phone | `/install-apk` | `/install-apk app-debug.apk` |
 | Login trên app mobile | `/mobile-test` | `/mobile-test tests/mobile/app-auth.mobile.ts` |
 | WebView trong app | `/mobile-test` | `/mobile-test tests/mobile/webview.mobile.ts` |
 | Swipe/scroll trên app | `/mobile-test` | `/mobile-test tests/mobile/gestures.mobile.ts` |
+| Flutter app | `/flutter-test` | `/flutter-test --integration` |
+| React Native app | `/rn-test` | `/rn-test --e2e --build` |
+| **API Testing** | | |
+| Test REST endpoint | `/api-test` | `/api-test tests/api/users.api.ts` |
+| Test Postman collection | `/api-test` | `/api-test collection.postman.json` |
+| Contract test (Pact) | `/contract-test` | `/contract-test --provider` |
+| **Unit Testing** | | |
+| Unit test (Vitest/Jest) | `/unit-test` | `/unit-test --coverage` |
+| Database test | `/db-test` | `/db-test --reset --seed` |
+| **Performance** | | |
 | Load test API | `/run-test` | `/run-test tests/performance/api-load.k6.js` |
-| Xem device nào available | `/devices` | `/devices` |
+| Website speed audit | `/lighthouse` | `/lighthouse https://example.com` |
+| **Quality & Security** | | |
+| Security scan | `/security-test` | `/security-test` hoặc `/security-test deps --fix` |
+| Accessibility WCAG | `/a11y-test` | `/a11y-test https://localhost:3000` |
+| Smoke test sau deploy | `/smoke-test` | `/smoke-test --env production` |
+| **DevOps** | | |
+| Generate CI/CD | `/ci-gen` | `/ci-gen github` |
+| Docker test env | `/docker-test` | `/docker-test up` → test → `/docker-test down` |
+| Gửi kết quả team | `/notify` | `/notify slack` |
+| Generate test data | `/test-data` | `/test-data generate --schema user --count 50` |
+| **System** | | |
+| Xem device available | `/devices` | `/devices` |
 | Start Appium server | `/appium` | `/appium start` |
 | Xem kết quả test | `/test-report` | `/test-report --failures-only` |
 | Tổng quan hệ thống | `/monitor` | `/monitor` |
