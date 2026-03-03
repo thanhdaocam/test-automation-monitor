@@ -67,3 +67,17 @@ Deploy an APK file to a connected Android device or emulator.
      - "INSTALL_FAILED_ALREADY_EXISTS" → try `adb install -r`
      - "INSTALL_FAILED_INSUFFICIENT_STORAGE" → free up device storage
      - "device unauthorized" → enable USB debugging and accept the prompt on device
+
+## Error Recovery
+
+- If ADB not found: "ADB not installed. Run `/setup-test-env` to check your environment."
+- If file is not `.apk`: warn user, ask if they meant a different file.
+- If install takes too long (>60s): suggest checking device screen for install permission dialog.
+- If `INSTALL_FAILED_UPDATE_INCOMPATIBLE`: suggest uninstalling first with `adb uninstall <package>`.
+- If `INSTALL_FAILED_VERSION_DOWNGRADE`: suggest adding `-d` flag or uninstalling first.
+
+## Related Skills
+
+- List devices first: `/devices`
+- Run mobile test after install: `/mobile-test <file> --device <device_id>`
+- Check environment: `/setup-test-env`

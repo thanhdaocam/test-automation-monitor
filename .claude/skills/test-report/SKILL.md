@@ -10,6 +10,10 @@ argument-hint: [--last] [--file path] [--failures-only] [--suite name]
 
 Parse and display test results from Playwright, WebdriverIO, or k6 runs.
 
+## Available Result Files
+
+!`ls -lt test-results/ playwright-report/ reports/ 2>/dev/null | head -10 || echo "No test result directories found"`
+
 ## Parse Arguments
 
 - `--last` = show the most recent test results (default if no args)
@@ -132,3 +136,17 @@ After showing results:
 - If failures: "Run `/run-test <file> --debug` to debug the failing test"
 - If performance issues: "Consider optimizing endpoints with p(95) > 500ms"
 - If no results found: "No test results found. Run `/run-test` or `/mobile-test` first."
+
+## Error Recovery
+
+- If no result files found anywhere: suggest running tests first with `/run-test` or `/mobile-test`.
+- If JSON parse fails: try reading as plain text and extract what we can.
+- If file path given but doesn't exist: search for similar files and suggest alternatives.
+- If results directory is very large: only parse the most recent file.
+
+## Related Skills
+
+- Run web tests: `/run-test <file>`
+- Run mobile tests: `/mobile-test <file>`
+- Quick overview: `/monitor`
+- Create tests: `/scaffold-test`

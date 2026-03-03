@@ -9,6 +9,12 @@ user-invocable: true
 
 Display a comprehensive status overview of the entire testing environment.
 
+## Quick Status Snapshot
+
+Appium: !`curl -s http://localhost:4723/status 2>/dev/null | node -e "try{const d=JSON.parse(require('fs').readFileSync('/dev/stdin','utf8'));console.log('running v'+d.value.build.version)}catch{console.log('not running')}" 2>/dev/null || echo "not running"`
+Devices: !`adb devices 2>/dev/null | grep -c "device$" || echo "0"` connected
+Last results: !`ls -t test-results/ playwright-report/ reports/ 2>/dev/null | head -1 || echo "none found"`
+
 ## Steps
 
 Run ALL of the following checks and compile results into a single dashboard view. Run checks in logical groups.
@@ -104,3 +110,14 @@ Show warnings for any issues detected:
 - No devices: "⚠ No devices connected. Connect a device or start an emulator."
 - Missing tools: "⚠ <tool> not found. Run `/setup-test-env`"
 - No test results: "⚠ No test results found. Run `/run-test` to get started."
+
+## Error Recovery
+
+- If any check command fails or times out: mark that section as "unknown" and continue with other checks.
+- If ADB not installed: skip device section, show warning.
+- If no test results directory exists: show "No tests have been run yet" instead of error.
+- Run all checks regardless of individual failures - never stop early.
+
+## Related Skills
+
+All available skills are shown in the Quick Actions section of the dashboard output.

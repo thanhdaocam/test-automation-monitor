@@ -9,6 +9,10 @@ user-invocable: true
 
 Discover and display all connected Android and iOS devices/emulators.
 
+## Current Device Status
+
+!`adb devices -l 2>/dev/null || echo "ADB not available"`
+
 ## Steps
 
 1. **Check ADB is available**:
@@ -67,3 +71,16 @@ Discover and display all connected Android and iOS devices/emulators.
    - iOS: "Connect an iPhone via USB and trust the computer, or boot a simulator with `xcrun simctl boot <device>`."
 
 8. **Tip**: Mention that the user can use a specific device with `/mobile-test --device <id>` or `/install-apk <apk> <device_id>`.
+
+## Error Recovery
+
+- If `adb` not found: suggest running `/setup-test-env` first.
+- If `adb devices` returns "daemon not running": ADB will auto-start, wait and retry.
+- If device shows "unauthorized": tell user to check the USB debugging prompt on the device screen.
+- If device shows "offline": suggest `adb kill-server && adb start-server`.
+
+## Related Skills
+
+- Install an app: `/install-apk <path.apk> <device_id>`
+- Run mobile test: `/mobile-test <file> --device <device_id>`
+- Start Appium: `/appium start`

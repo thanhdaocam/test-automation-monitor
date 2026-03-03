@@ -134,3 +134,17 @@ Create all three project types in one go. Run web, mobile, and performance scaff
      2. Run: /run-test tests/web/login.spec.ts
    ═══════════════════════════════════
    ```
+
+## Error Recovery
+
+- If `templates/` directory not found: the skill is being used outside the test-automation-monitor repo. Generate files inline instead of copying from templates.
+- If `npm install` fails: show the error and suggest running manually or checking network connection.
+- If target directory already has files: warn before overwriting and ask user to confirm.
+- If Playwright browser install fails: suggest `npx playwright install --with-deps chromium`.
+
+## Related Skills
+
+- After scaffolding web tests: `/run-test tests/web/login.spec.ts`
+- After scaffolding mobile tests: `/appium start` then `/mobile-test tests/mobile/app-login.mobile.ts`
+- After scaffolding perf tests: `/run-test tests/performance/load-test.k6.js`
+- Check environment: `/setup-test-env`

@@ -131,3 +131,17 @@ appium driver list --installed 2>/dev/null
    ```
 
 5. Report installed drivers with versions.
+
+## Error Recovery
+
+- If `appium` not found: suggest `npm install -g appium` or run `/setup-test-env`.
+- If port already in use by non-Appium process: warn user and suggest a different port with `--port`.
+- If Appium fails to start: show last 20 lines of `/tmp/appium.log` for diagnosis.
+- If `curl` not available on Windows: use `Invoke-WebRequest` or just check the process list.
+- On Windows, use `netstat -ano | findstr :<port>` and `taskkill /PID <pid> /F` instead of `lsof`/`kill`.
+
+## Related Skills
+
+- Check devices after starting: `/devices`
+- Run mobile tests: `/mobile-test <file>`
+- Full environment check: `/setup-test-env`

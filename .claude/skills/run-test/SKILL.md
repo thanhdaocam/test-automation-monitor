@@ -10,6 +10,14 @@ argument-hint: [test-file-or-pattern] [--headed] [--debug] [--grep pattern] [--w
 
 Execute Playwright web tests or k6 performance tests and display formatted results.
 
+## Current Project Context
+
+Available test scripts in package.json:
+!`cat package.json 2>/dev/null | node -e "try{const p=JSON.parse(require('fs').readFileSync('/dev/stdin','utf8'));console.log(Object.entries(p.scripts||{}).filter(([k])=>k.includes('test')).map(([k,v])=>k+': '+v).join('\n')||'No test scripts found')}catch{console.log('No package.json found')}" 2>/dev/null`
+
+Test files found:
+!`find . -maxdepth 4 -type f \( -name "*.spec.ts" -o -name "*.test.ts" -o -name "*.k6.js" -o -name "*.spec.js" -o -name "*.test.js" \) 2>/dev/null | head -15 || echo "No test files found"`
+
 ## Parse Arguments
 
 - `$0` = test file, pattern, or directory (optional, runs all if omitted)
@@ -119,3 +127,19 @@ Result: FAILED (1 threshold breached)
 - If any failed: show failure details + suggest next steps
 - Mention: "Use `/test-report` for detailed analysis of results"
 - If test result files exist, note their location for later reference
+
+## Error Recovery
+
+- If `npx playwright` not found: "Playwright not installed. Run `npm install -D @playwright/test && npx playwright install` or use `/setup-test-env`."
+- If `k6` not found: "k6 not installed. See https://k6.io/docs/get-started/installation/ or run `/setup-test-env`."
+- If no test files match the pattern: search the project and suggest matching files.
+- If Playwright browser not installed: suggest `npx playwright install chromium`.
+- If tests timeout: suggest increasing timeout or checking if the target server is running.
+- For mobile/app tests: redirect to `/mobile-test` instead - this skill is for web and performance only.
+
+## Related Skills
+
+- For mobile tests: `/mobile-test <file>`
+- View detailed report: `/test-report --last`
+- Create sample tests: `/scaffold-test web` or `/scaffold-test performance`
+- Status overview: `/monitor`

@@ -86,3 +86,16 @@ Check all prerequisites for the test automation toolkit and guide the user to in
 5. If anything is missing, offer to install it automatically (only for npm-based tools like Appium, Playwright). Ask before running install commands.
 
 6. If everything is ready, confirm: "Environment is ready! You can now use `/devices`, `/run-test`, `/mobile-test`."
+
+## Error Recovery
+
+- If a command hangs or times out, skip it and mark as "unknown".
+- If the user is on Windows and `which` doesn't work, use `where` instead.
+- If running in CI (detect via `$CI` env var), skip interactive install prompts.
+
+## Related Skills
+
+- After setup: use `/devices` to check connected devices
+- To start Appium: use `/appium start`
+- To create test files: use `/scaffold-test`
+- Quick status check: use `/monitor`

@@ -1,10 +1,10 @@
 # Dependencies
 node_modules/
-target/
 
 # Build output
 dist/
-src-tauri/target/
+build/
+target/
 
 # Environment
 .env
@@ -26,18 +26,15 @@ desktop.ini
 # Logs
 *.log
 npm-debug.log*
+/tmp/
 
-# Test results & artifacts
+# Test results & artifacts (generated at runtime)
 test-results/
 playwright-report/
+reports/
+allure-results/
 screenshots/
 videos/
 
-# SQLite database (user data)
-*.db
-*.sqlite
-*.sqlite3
-
-# Tauri build
-src-tauri/WixTools/
-src-tauri/gen/
+# Appium logs
+/tmp/appium.log

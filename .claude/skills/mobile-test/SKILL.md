@@ -118,3 +118,22 @@ Duration: 17.5s
 - Suggest: "Use `/test-report` for detailed analysis"
 - If WebView tests failed, suggest checking WebView context availability
 - If app crash detected, suggest checking `adb logcat` output
+
+## Error Recovery
+
+- If Appium fails to start: show error log and suggest `/appium install-drivers` or check Java installation.
+- If device not found: suggest `/devices` to see what's available, or check USB connection.
+- If `wdio.conf.ts` not found and generation fails: guide user to run `/scaffold-test mobile` first.
+- If WebView context not available: suggest ensuring the app has WebView debugging enabled (`setWebContentsDebuggingEnabled(true)` in app code).
+- If `ECONNREFUSED` on port 4723: Appium is not running, auto-start or suggest `/appium start`.
+- If session creation fails: check that the correct Appium driver is installed for the target platform.
+- If iOS test on Windows: warn that iOS testing requires macOS. Suggest using Android instead.
+- On timeout errors: suggest increasing `waitforTimeout` in wdio.conf.ts or checking app loading time.
+
+## Related Skills
+
+- Check devices: `/devices`
+- Start Appium: `/appium start`
+- Install APK first: `/install-apk <path.apk>`
+- View results: `/test-report --last`
+- Create sample test: `/scaffold-test mobile`
