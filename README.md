@@ -1,81 +1,104 @@
 # Test Automation Monitor
 
-A Windows desktop application for monitoring and managing automation tests across **Web**, **Android**, **iOS**, and **WebView** platforms.
-
-Built with **Tauri v2** (Rust) + **React** (TypeScript).
+Bộ **Claude Code Skills** để monitor và quản lý automation test trên **Web**, **Android**, **iOS**, và **WebView** - chạy trực tiếp trong Claude Code bằng slash commands.
 
 ## Features
 
-- **Realtime Dashboard** - Live monitoring of test execution with pass/fail charts
-- **Multi-Platform Testing**
-  - Web: Playwright
-  - Android (.apk): Appium 2.0 + WebdriverIO
-  - iOS (.ipa): Appium 2.0 + WebdriverIO
-  - WebView (hybrid apps): Appium context switching
-  - Performance: k6
-- **Device Management** - Auto-detect connected Android/iOS devices
-- **Test Case Management** - CRUD suites/cases with tags, priority, platform assignment
-- **Scheduled Runs** - Cron-based automatic test execution
-- **CI/CD Integration** - REST API + webhooks (GitHub Actions, GitLab CI, Jenkins)
-- **Notifications** - Slack, Email, Discord, Microsoft Teams
-- **Reports & Analytics** - Trend analysis, flaky test detection, export (HTML/PDF/JUnit XML)
+9 slash commands cho toàn bộ automation test workflow:
 
-## Tech Stack
+| Command | Mô tả |
+|---------|-------|
+| `/setup-test-env` | Kiểm tra & cài đặt Node.js, Java, ADB, Appium, Playwright, k6 |
+| `/devices` | List Android/iOS devices đang kết nối |
+| `/appium` | Start / stop / check status Appium server |
+| `/install-apk` | Cài APK lên Android device |
+| `/run-test` | Chạy Playwright hoặc k6 tests |
+| `/mobile-test` | Chạy WebdriverIO + Appium tests trên mobile |
+| `/test-report` | Xem kết quả test, thống kê pass/fail |
+| `/monitor` | Tổng quan status: devices, services, tests |
+| `/scaffold-test` | Tạo test project mới từ template |
 
-| Component | Technology |
-|-----------|-----------|
-| Desktop | Tauri v2 (Rust backend) |
-| Frontend | React 18 + TypeScript + Vite |
-| UI | Shadcn/ui + Tailwind CSS v4 |
-| Charts | Recharts |
-| State | Zustand |
-| Database | SQLite (local) |
-| Web Tests | Playwright |
-| Mobile Tests | Appium 2.0 + WebdriverIO |
-| Perf Tests | k6 |
-| CI/CD API | Axum (embedded HTTP server) |
+### Multi-Platform Support
+
+- **Web**: Playwright (Chrome, Firefox, Safari)
+- **Android** (.apk): Appium 2.0 + WebdriverIO + UiAutomator2
+- **iOS** (.ipa): Appium 2.0 + WebdriverIO + XCUITest
+- **WebView**: Appium context switching (NATIVE ↔ WEBVIEW)
+- **Performance**: k6 load testing
+
+## Quick Start
+
+### 1. Clone repo
+
+```bash
+git clone https://github.com/thanhdaocam/test-automation-monitor.git
+```
+
+### 2. Copy skills vào project của bạn
+
+```bash
+# Copy thư mục .claude/skills/ vào project bạn muốn test
+cp -r test-automation-monitor/.claude/skills/ your-project/.claude/skills/
+
+# Hoặc copy toàn bộ (skills + templates + scripts)
+cp -r test-automation-monitor/.claude/ your-project/.claude/
+cp -r test-automation-monitor/scripts/ your-project/scripts/
+cp -r test-automation-monitor/templates/ your-project/templates/
+```
+
+### 3. Mở Claude Code và dùng
+
+```bash
+cd your-project
+claude
+
+# Trong Claude Code:
+> /setup-test-env          # Kiểm tra environment
+> /devices                  # Xem devices
+> /run-test login.spec.ts   # Chạy web test
+> /mobile-test app.mobile.ts --device emulator-5554   # Chạy mobile test
+> /test-report --last       # Xem kết quả
+```
 
 ## Prerequisites
 
-Before starting, make sure you have these installed:
-
-### Required
+### Bắt buộc
 
 ```bash
+# Claude Code
+claude --version
+
 # Node.js 20+
-node --version   # v20.x or higher
-
-# pnpm (recommended) or npm
-pnpm --version
-
-# Rust toolchain
-rustc --version
-cargo --version
-
-# Java 11+ (required by Appium)
-java --version
+node --version
 ```
 
-### For Android Testing
+### Cho Web Testing
 
 ```bash
+# Playwright
+npm install -D @playwright/test
+npx playwright install
+```
+
+### Cho Android Testing
+
+```bash
+# Java 11+
+java --version
+
 # Android SDK + ADB
-# Option 1: Install Android Studio (includes SDK + ADB)
-# Option 2: Install standalone command-line tools
 adb --version
+# Set ANDROID_HOME environment variable
 
-# Set environment variable
-# ANDROID_HOME=C:\Users\<you>\AppData\Local\Android\Sdk
-
-# Appium 2.0 + UiAutomator2 driver
+# Appium 2.0
 npm install -g appium
 appium driver install uiautomator2
 ```
 
-### For iOS Testing (requires macOS)
+### Cho iOS Testing (cần macOS)
 
 ```bash
-# Xcode (from App Store)
+# Xcode
 xcode-select --install
 
 # Appium XCUITest driver
@@ -85,211 +108,219 @@ appium driver install xcuitest
 brew install ios-deploy libimobiledevice
 ```
 
-> **Note**: iOS testing is NOT possible on Windows natively. Use a Mac or cloud services (BrowserStack, SauceLabs).
+> **Note**: iOS testing không chạy được trên Windows. Cần Mac hoặc cloud service.
 
-### For Performance Testing
+### Cho Performance Testing
 
 ```bash
-# k6 - download from https://k6.io/docs/get-started/installation/
+# k6
+# Windows: choco install k6 / winget install k6
+# macOS: brew install k6
 k6 version
 ```
 
-## Getting Started
-
-### 1. Clone & Install
-
-```bash
-git clone <repo-url>
-cd test-automation-monitor
-
-# Install frontend dependencies
-pnpm install
-
-# Rust dependencies are auto-installed on first build
-```
-
-### 2. Development
-
-```bash
-# Start dev server (Tauri + Vite HMR)
-pnpm tauri dev
-```
-
-### 3. Build for Production
-
-```bash
-# Build Windows installer (.msi / .exe)
-pnpm tauri build
-```
+Hoặc chạy `/setup-test-env` để tự động kiểm tra tất cả.
 
 ## Project Structure
 
 ```
 test-automation-monitor/
-├── src-tauri/              # Rust backend
-│   ├── src/
-│   │   ├── commands/       # Tauri IPC commands
-│   │   ├── services/       # Business logic
-│   │   └── models/         # Data structures
-│   ├── migrations/         # SQLite migrations
-│   └── Cargo.toml
-├── src/                    # React frontend
-│   ├── routes/             # Page components
-│   ├── components/         # UI components
-│   ├── hooks/              # Custom React hooks
-│   ├── stores/             # Zustand stores
-│   └── lib/                # Utilities & types
-├── tests/                  # Test scripts
-│   ├── web/                # Playwright tests
-│   ├── mobile/             # WebdriverIO + Appium tests
-│   └── performance/        # k6 scripts
-├── PLAN.md                 # Detailed implementation plan
-└── README.md               # This file
+├── .claude/
+│   └── skills/                     # Claude Code Skills
+│       ├── setup-test-env/SKILL.md # Kiểm tra environment
+│       ├── devices/SKILL.md        # List devices
+│       ├── appium/SKILL.md         # Appium server control
+│       ├── install-apk/SKILL.md    # Install APK
+│       ├── run-test/SKILL.md       # Chạy web/perf tests
+│       ├── mobile-test/SKILL.md    # Chạy mobile tests
+│       ├── test-report/SKILL.md    # Xem test results
+│       ├── monitor/SKILL.md        # Status dashboard
+│       └── scaffold-test/SKILL.md  # Tạo project từ template
+│
+├── scripts/                        # Helper scripts
+│   ├── check-env.sh
+│   ├── parse-playwright-results.sh
+│   ├── parse-wdio-results.sh
+│   └── parse-k6-results.sh
+│
+├── templates/                      # Test config templates
+│   ├── playwright.config.ts
+│   ├── wdio.conf.ts
+│   ├── sample.spec.ts
+│   ├── sample.mobile.ts
+│   └── sample.k6.js
+│
+├── examples/                       # Complete examples
+│   ├── web-test-example/
+│   ├── mobile-test-example/
+│   └── perf-test-example/
+│
+├── CLAUDE.md                       # Project conventions
+├── PLAN.md                         # Architecture & decisions
+├── TODO.md                         # Task tracking
+├── INSTALL.md                      # Detailed installation
+├── SKILLS.md                       # Skills reference
+└── README.md                       # This file
 ```
 
-## Usage
+## Usage Examples
 
-### Running Tests from UI
+### Kiểm tra environment
 
-1. **Connect devices** - Plug in Android/iOS device or start emulator
-2. **Add test suite** - Go to Test Suites → Create New
-3. **Add test cases** - Link to your Playwright/WebdriverIO/k6 scripts
-4. **Run** - Click Run button, watch results in realtime
+```
+> /setup-test-env
 
-### CI/CD Integration
-
-The app runs an embedded REST API server (default port `9876`):
-
-```bash
-# Trigger a test suite
-curl -X POST http://localhost:9876/api/trigger \
-  -H "Content-Type: application/json" \
-  -d '{"suite_id": "your-suite-id"}'
-
-# Check status
-curl http://localhost:9876/api/status/{run_id}
-
-# Get results
-curl http://localhost:9876/api/results/{run_id}
+✓ Node.js      v20.11.0
+✓ Java         17.0.2
+✓ ADB          34.0.5
+✓ Appium       2.5.1
+  - uiautomator2  2.34.0
+✓ Playwright   1.42.0
+✓ k6           0.49.0
 ```
 
-### CLI Headless Mode
+### List devices
 
-```bash
-# Run tests without GUI
-test-monitor --headless --suite=smoke --output=junit.xml
+```
+> /devices
+
+Connected Devices:
+┌──────────────────┬─────────────┬────────────┬──────────┐
+│ Device ID        │ Model       │ OS         │ Status   │
+├──────────────────┼─────────────┼────────────┼──────────┤
+│ emulator-5554    │ Pixel 7     │ Android 14 │ online   │
+│ R5CT32XXXXX      │ Galaxy S23  │ Android 13 │ online   │
+└──────────────────┴─────────────┴────────────┴──────────┘
 ```
 
-### Example: WebdriverIO Mobile Test
+### Chạy web test
 
-```typescript
-// tests/mobile/login.mobile.ts
-describe('Login Flow', () => {
-    it('should login on Android app', async () => {
-        const username = await $('~usernameInput');
-        await username.setValue('testuser');
+```
+> /run-test tests/login.spec.ts
 
-        const password = await $('~passwordInput');
-        await password.setValue('password123');
+Running Playwright tests...
 
-        const loginBtn = await $('~loginButton');
-        await loginBtn.click();
+Results:
+  ✓ should display login form          (1.2s)
+  ✓ should login with valid creds      (2.4s)
+  ✗ should show error on invalid pass  (1.8s)
+    Error: Expected "Invalid password" but got "Error occurred"
+    at login.spec.ts:42
 
-        // Switch to WebView inside the app
-        const contexts = await driver.getContexts();
-        await driver.switchContext('WEBVIEW_com.example.app');
-
-        // Now use web selectors
-        const welcome = await $('h1');
-        expect(await welcome.getText()).toBe('Welcome');
-    });
-});
+Summary: 2 passed, 1 failed, 0 skipped (5.4s)
 ```
 
-### Example: GitHub Actions Integration
+### Chạy mobile test
 
-```yaml
-name: Mobile Tests
-on: [push]
-jobs:
-  test:
-    runs-on: self-hosted  # needs device access
-    steps:
-      - uses: actions/checkout@v4
+```
+> /mobile-test tests/app-login.mobile.ts --device emulator-5554
 
-      - name: Trigger tests
-        run: |
-          RUN_ID=$(curl -s -X POST http://localhost:9876/api/trigger \
-            -H "Content-Type: application/json" \
-            -d '{"suite_id": "mobile-smoke"}' | jq -r '.run_id')
-          echo "RUN_ID=$RUN_ID" >> $GITHUB_ENV
+Starting Appium server... ✓ (port 4723)
+Connecting to emulator-5554... ✓
 
-      - name: Wait for results
-        run: |
-          while true; do
-            STATUS=$(curl -s http://localhost:9876/api/status/$RUN_ID | jq -r '.status')
-            [ "$STATUS" = "passed" ] || [ "$STATUS" = "failed" ] && break
-            sleep 10
-          done
-          curl -s http://localhost:9876/api/results/$RUN_ID > results.json
+Running WebdriverIO tests...
 
-      - name: Upload results
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results
-          path: results.json
+Results:
+  ✓ should open app                    (3.1s)
+  ✓ should login on native screen      (4.2s)
+  ✓ should switch to WebView           (2.8s)
+  ✓ should interact with web content   (1.5s)
+
+Summary: 4 passed, 0 failed (11.6s)
 ```
 
-## Notification Setup
+### Xem báo cáo
 
-| Channel | What you need |
-|---------|--------------|
-| Slack | Incoming Webhook URL |
-| Discord | Webhook URL |
-| Teams | Webhook URL |
-| Email | SMTP host, port, username, password |
+```
+> /test-report --last
 
-Configure in **Settings → Notifications** within the app.
+Last Run: 2026-03-03 14:30:00
+Suite: login-tests
+Platform: Android (emulator-5554)
+
+Results: 6 passed, 1 failed, 0 skipped
+Duration: 17.0s
+Pass Rate: 85.7%
+
+Failed Tests:
+  ✗ login.spec.ts:42 - should show error on invalid pass
+    Error: Expected "Invalid password" but got "Error occurred"
+```
+
+### System monitor
+
+```
+> /monitor
+
+═══ Test Automation Monitor ═══
+
+Services:
+  Appium Server    ✓ running (port 4723)
+  ADB Server       ✓ running
+
+Devices:
+  emulator-5554    ✓ online  (Pixel 7, Android 14)
+  R5CT32XXXXX      ✓ online  (Galaxy S23, Android 13)
+
+Last Test Run:
+  Suite: smoke-tests
+  Status: PASSED (6/6)
+  Time: 5 minutes ago
+
+Environment:
+  Node.js: v20.11.0
+  Appium: 2.5.1
+  Playwright: 1.42.0
+  k6: 0.49.0
+```
 
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────┐
-│           TAURI v2 APPLICATION              │
-│                                             │
-│  ┌─────────────┐    ┌───────────────────┐   │
-│  │   React UI  │◄──►│   Rust Backend    │   │
-│  │  (WebView)  │IPC │                   │   │
-│  └─────────────┘    │  ┌─────────────┐  │   │
-│                     │  │ Orchestrator│  │   │
-│                     │  └──────┬──────┘  │   │
-│                     │         │         │   │
-│                     │    ┌────┼────┐    │   │
-│                     │    ▼    ▼    ▼    │   │
-│                     │   PW  WDIO  k6   │   │
-│                     │                   │   │
-│                     │  ┌─────────────┐  │   │
-│                     │  │   SQLite    │  │   │
-│                     │  └─────────────┘  │   │
-│                     │  ┌─────────────┐  │   │
-│                     │  │ Axum (API)  │  │   │
-│                     │  └─────────────┘  │   │
-│                     └───────────────────┘   │
-└─────────────────────────────────────────────┘
-         │              │              │
-    ┌────▼────┐    ┌────▼────┐    ┌───▼────┐
-    │ Android │    │   iOS   │    │Browser │
-    │ Device  │    │ Device  │    │        │
-    └─────────┘    └─────────┘    └────────┘
+┌──────────────────────────────────────────────────────────┐
+│                    CLAUDE CODE                           │
+│                                                          │
+│  User: /run-test login.spec.ts                          │
+│       │                                                  │
+│       ▼                                                  │
+│  ┌─────────────┐                                        │
+│  │  SKILL.md   │  ← Prompt instructions                │
+│  └──────┬──────┘                                        │
+│         │                                                │
+│         ▼                                                │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐  │
+│  │    Bash     │    │    Read     │    │    Grep     │  │
+│  │  (execute)  │    │  (results)  │    │  (search)   │  │
+│  └──────┬──────┘    └─────────────┘    └─────────────┘  │
+│         │                                                │
+└─────────┼────────────────────────────────────────────────┘
+          │
+          ▼
+┌─────────────────────────────────────────┐
+│            TEST ENGINES                  │
+│                                          │
+│  ┌──────────┐  ┌──────────┐  ┌───────┐  │
+│  │Playwright│  │WebdriverIO│  │  k6   │  │
+│  └────┬─────┘  └────┬─────┘  └───┬───┘  │
+│       │              │            │       │
+│       ▼              ▼            ▼       │
+│   Browser        Appium       HTTP       │
+│                  Server       Load       │
+│                     │                     │
+│              ┌──────┴──────┐              │
+│              ▼             ▼              │
+│          Android         iOS             │
+│          Device         Device           │
+└─────────────────────────────────────────┘
 ```
 
 ## License
 
-MIT
+by ThanhDaoCam
 
 ## Related Documentation
 
-- [Tauri v2 Docs](https://v2.tauri.app)
+- [Claude Code Skills](https://docs.anthropic.com/en/docs/claude-code)
 - [Appium 2.0 Docs](https://appium.io/docs/en/latest/)
 - [WebdriverIO Docs](https://webdriver.io)
 - [Playwright Docs](https://playwright.dev)
