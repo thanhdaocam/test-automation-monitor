@@ -1,230 +1,131 @@
 # TODO - Test Automation Monitor (Claude Code Skills)
 
 > **Approach**: Bộ Claude Code Skills - slash commands cho automation testing
-> **Status: COMPLETED** ✅ | Share qua Git repo, ai cài Claude Code là dùng được
+> **Status: v2.0 COMPLETED** ✅ | 24 skills, 20+ templates, 7 scripts
 
 ---
 
 ## Tổng quan
 
-Thay vì build desktop app phức tạp (Tauri + Rust + React), ta build **bộ Claude Code Skills**:
+Bộ **24 Claude Code Skills** toàn diện cho automation testing:
 - Người dùng chỉ cần clone repo + copy `.claude/skills/` vào project
-- Gõ `/run-test`, `/devices`, v.v. trong Claude Code
+- Gõ `/run-test`, `/devices`, `/security-test`, v.v. trong Claude Code
 - Claude AI xử lý logic, parse output, hiển thị kết quả đẹp
 - Không cần GUI, không cần compile, chạy ở đâu cũng được
 
-### Skills đã tạo
+### Skills (24 total)
 
-| Skill | Slash Command | Mô tả | Status |
-|-------|--------------|-------|--------|
-| Run Test | `/run-test` | Chạy Playwright / k6 tests | ✅ Done |
-| Devices | `/devices` | List Android/iOS devices đang kết nối | ✅ Done |
-| Install APK | `/install-apk` | Cài APK lên Android device | ✅ Done |
-| Appium | `/appium` | Start/stop Appium server | ✅ Done |
-| Test Report | `/test-report` | Xem kết quả test, thống kê pass/fail | ✅ Done |
-| Monitor | `/monitor` | Tổng quan status: devices, services, tests | ✅ Done |
-| Setup | `/setup-test-env` | Kiểm tra & cài đặt prerequisites | ✅ Done |
-| Mobile Test | `/mobile-test` | Chạy test trên mobile (WDIO + Appium) | ✅ Done |
-| Scaffold | `/scaffold-test` | Tạo test project từ template | ✅ Done |
-
----
-
-## Day 1: Core Skills + Setup ✅ COMPLETED
-
-### Sáng (4h)
-
-- [x] **T1.1** Tạo project structure
-  - [x] Tạo thư mục `.claude/skills/` với subdirectories cho mỗi skill
-  - [x] Tạo `scripts/` cho helper scripts (bash)
-  - [x] Tạo `templates/` cho sample test configs
-  - [x] Tạo `examples/` cho sample test files
-
-- [x] **T1.2** Skill: `/setup-test-env`
-  - [x] SKILL.md: kiểm tra Node.js, Java, ADB, Appium, Playwright, k6
-  - [x] Auto-detect đường dẫn từ PATH / env vars
-  - [x] Hướng dẫn cài missing dependencies
-  - [x] Verify tất cả đã sẵn sàng
-  - [x] Script: `scripts/check-env.sh` - verify prerequisites
-
-- [x] **T1.3** Skill: `/devices`
-  - [x] SKILL.md: chạy `adb devices`, parse output
-  - [x] Hiển thị bảng: Device ID, Model, OS Version, Status
-  - [x] Detect cả emulators và physical devices
-  - [x] Cảnh báo nếu ADB không tìm thấy
-
-- [x] **T1.4** Skill: `/appium`
-  - [x] SKILL.md: `start` / `stop` / `status` subcommands
-  - [x] Start: `appium server --port 4723 --allow-cors`
-  - [x] Stop: tìm và kill Appium process
-  - [x] Status: check port 4723 + health endpoint
-  - [x] Auto-install drivers nếu chưa có
-
-### Chiều (4h)
-
-- [x] **T1.5** Skill: `/install-apk`
-  - [x] SKILL.md: nhận path APK + optional device ID
-  - [x] Nếu nhiều devices → hỏi user chọn device
-  - [x] `adb -s <device> install -r <apk>`
-  - [x] Verify installation thành công
-  - [x] Hiển thị package name đã cài
-
-- [x] **T1.6** Skill: `/run-test`
-  - [x] SKILL.md: detect loại test từ file extension / package.json
-  - [x] Playwright: `npx playwright test <pattern> --reporter=json`
-  - [x] k6: `k6 run <script> --out json=results.json`
-  - [x] Parse JSON output → hiển thị bảng pass/fail
-  - [x] Hỗ trợ args: `--headed`, `--debug`, `--grep <pattern>`
-  - [x] Hiển thị summary: total, passed, failed, skipped, duration
-
-- [x] **T1.7** Template files
-  - [x] `templates/playwright.config.ts` - base Playwright config
-  - [x] `templates/wdio.conf.ts` - base WebdriverIO + Appium config
-  - [x] `templates/sample.spec.ts` - sample Playwright test
-  - [x] `templates/sample.mobile.ts` - sample WebdriverIO test
-  - [x] `templates/sample.k6.js` - sample k6 performance test
-
-**Day 1 Checkpoint**: ✅ DONE
+| # | Skill | Slash Command | Category | Status |
+|---|-------|--------------|----------|--------|
+| 1 | Setup | `/setup-test-env` | Core | ✅ v1.0 |
+| 2 | Devices | `/devices` | Core | ✅ v1.0 |
+| 3 | Appium | `/appium` | Core | ✅ v1.0 |
+| 4 | Install APK | `/install-apk` | Core | ✅ v1.0 |
+| 5 | Run Test | `/run-test` | Core | ✅ v1.0 |
+| 6 | Mobile Test | `/mobile-test` | Core | ✅ v1.0 |
+| 7 | Test Report | `/test-report` | Core | ✅ v1.0 |
+| 8 | Monitor | `/monitor` | Core | ✅ v1.0 |
+| 9 | Scaffold | `/scaffold-test` | Core | ✅ v1.0 |
+| 10 | API Test | `/api-test` | Extended | ✅ v2.0 |
+| 11 | Unit Test | `/unit-test` | Extended | ✅ v2.0 |
+| 12 | DB Test | `/db-test` | Extended | ✅ v2.0 |
+| 13 | Security Test | `/security-test` | Quality | ✅ v2.0 |
+| 14 | A11y Test | `/a11y-test` | Quality | ✅ v2.0 |
+| 15 | CI Generator | `/ci-gen` | DevOps | ✅ v2.0 |
+| 16 | Notify | `/notify` | DevOps | ✅ v2.0 |
+| 17 | Cypress Test | `/cypress-test` | Extended | ✅ v2.0 |
+| 18 | Flutter Test | `/flutter-test` | Extended | ✅ v2.0 |
+| 19 | RN Test | `/rn-test` | Extended | ✅ v2.0 |
+| 20 | Visual Test | `/visual-test` | Quality | ✅ v2.0 |
+| 21 | Contract Test | `/contract-test` | Extended | ✅ v2.0 |
+| 22 | Test Data | `/test-data` | DevOps | ✅ v2.0 |
+| 23 | Lighthouse | `/lighthouse` | Quality | ✅ v2.0 |
+| 24 | Docker Test | `/docker-test` | DevOps | ✅ v2.0 |
+| 25 | Smoke Test | `/smoke-test` | Extended | ✅ v2.0 |
 
 ---
 
-## Day 2: Mobile Testing + Reports ✅ COMPLETED
+## v1.0 - Core Skills ✅ COMPLETED
 
-### Sáng (4h)
+### Day 1: Core Skills + Setup
+- [x] Project structure (.claude/skills/, scripts/, templates/)
+- [x] `/setup-test-env` - environment check
+- [x] `/devices` - list connected devices
+- [x] `/appium` - Appium server management
+- [x] `/install-apk` - deploy APK to device
+- [x] `/run-test` - Playwright + k6 test runner
+- [x] Templates: playwright.config.ts, wdio.conf.ts, sample.spec.ts, sample.mobile.ts, sample.k6.js
 
-- [x] **T2.1** Skill: `/mobile-test`
-  - [x] SKILL.md: chạy WebdriverIO test trên mobile
-  - [x] Auto-check: Appium running? → nếu chưa, start
-  - [x] Auto-check: Device connected? → nếu chưa, list devices
-  - [x] Generate WDIO config on-the-fly nếu chưa có
-  - [x] Chạy: `npx wdio run wdio.conf.ts --spec <file>`
-  - [x] Parse results → hiển thị bảng
-  - [x] Capture screenshots on failure
-  - [x] Hỗ trợ args: `--device <id>`, `--platform android|ios`
+### Day 2: Mobile + Reports
+- [x] `/mobile-test` - WebdriverIO + Appium mobile testing
+- [x] `/test-report` - test results viewer
+- [x] `/monitor` - system status dashboard
+- [x] Helper scripts: parse-playwright-results.sh, parse-wdio-results.sh, parse-k6-results.sh
 
-- [x] **T2.2** Skill: `/test-report`
-  - [x] SKILL.md: tìm test results (JSON, JUnit XML, HTML reports)
-  - [x] Parse nhiều formats: Playwright JSON, WDIO JSON, k6 JSON
-  - [x] Hiển thị summary: pass/fail counts, duration, coverage
-  - [x] Chi tiết failures: test name, error message, file:line
-  - [x] So sánh với lần chạy trước (nếu có history)
-  - [x] Hỗ trợ args: `--last`, `--suite <name>`, `--failures-only`
+### Day 3: Polish + Docs
+- [x] `/scaffold-test` - project scaffolding
+- [x] Error recovery + related skills for all 9 skills
+- [x] Dynamic context injection
+- [x] Documentation: CLAUDE.md, README, PLAN, INSTALL, SKILLS
+- [x] Commit & push v0.1.0
 
-- [x] **T2.3** Helper scripts
-  - [x] `scripts/parse-playwright-results.sh` - extract từ JSON
-  - [x] `scripts/parse-wdio-results.sh` - extract từ JSON
-  - [x] `scripts/parse-k6-results.sh` - extract metrics
-
-### Chiều (4h)
-
-- [x] **T2.4** Skill: `/monitor`
-  - [x] SKILL.md: tổng quan status toàn bộ hệ thống
-  - [x] Check: Node.js version, Java version
-  - [x] Check: ADB running + devices connected
-  - [x] Check: Appium server status
-  - [x] Check: last test run results (nếu có)
-  - [x] Check: disk space, ports in use
-  - [x] Output dạng dashboard text-based đẹp
-
-- [x] **T2.5** Cải thiện `/run-test` cho parallel execution
-  - [x] Hỗ trợ chạy nhiều test files cùng lúc
-  - [x] Flag `--workers <n>`
-  - [x] Dynamic context injection: auto-detect test scripts
-
-- [x] **T2.6** Tạo `CLAUDE.md` project config
-  - [x] Hướng dẫn Claude Code cách dùng bộ skills
-  - [x] Conventions cho test files
-  - [x] Default settings / paths
-
-**Day 2 Checkpoint**: ✅ DONE
+**v1.0 Total: 9 skills, 5 templates, 4 scripts, 5 docs**
 
 ---
 
-## Day 3: Polish + Documentation + Publish ✅ COMPLETED
+## v2.0 - Extended Skills ✅ COMPLETED
 
-### Sáng (4h)
+### Phase 1: API + Unit + DB Testing
+- [x] `/api-test` - API/REST testing skill
+- [x] `/unit-test` - Vitest/Jest unit testing skill
+- [x] `/db-test` - database integration testing skill
+- [x] Templates: sample.api.ts, sample.unit.test.ts, sample.db.test.ts
+- [x] Scripts: parse-api-results.sh, parse-jest-results.sh
 
-- [x] **T3.1** Skill mở rộng: `/scaffold-test`
-  - [x] SKILL.md: tạo test project từ template
-  - [x] Hỏi user: Web / Mobile / Performance?
-  - [x] Copy template files phù hợp
-  - [x] Cài dependencies tự động
-  - [x] Tạo folder structure chuẩn
+### Phase 2: Security + A11y + CI/CD + Notifications
+- [x] `/security-test` - dependency audit + code analysis + OWASP
+- [x] `/a11y-test` - WCAG 2.2 accessibility testing
+- [x] `/ci-gen` - CI/CD pipeline generator (GitHub/GitLab/Jenkins/Azure)
+- [x] `/notify` - notifications to Slack/Teams/Discord/Email
+- [x] Templates: sample.a11y.ts, notification-config.json
+- [x] CI templates: github-actions.yml, gitlab-ci.yml, jenkinsfile, azure-pipelines.yml
 
-- [x] **T3.2** Cải thiện error handling cho tất cả skills
-  - [x] Mỗi skill có Error Recovery section
-  - [x] Gợi ý fix: "Run `/setup-test-env` to install missing tools"
-  - [x] Gợi ý fix: "Run `/appium start` before running mobile tests"
-  - [x] Cross-references giữa skills (Related Skills section)
+### Phase 3: Cypress + Flutter + React Native
+- [x] `/cypress-test` - Cypress E2E and component testing
+- [x] `/flutter-test` - Flutter unit/widget/integration testing
+- [x] `/rn-test` - React Native Jest + Detox testing
+- [x] Templates: cypress.config.ts, sample.cy.ts, sample_flutter_test.dart, detox.config.ts, sample.e2e.ts
+- [x] Scripts: parse-cypress-results.sh
 
-- [x] **T3.3** Dynamic context injection
-  - [x] `/run-test`: inject `!cat package.json` để detect test scripts + find test files
-  - [x] `/devices`: inject `!adb devices -l` vào prompt
-  - [x] `/monitor`: inject Appium status + device count + last results
-  - [x] `/test-report`: inject `!ls test-results/` vào prompt
+### Phase 4: Visual + Contract + Test Data
+- [x] `/visual-test` - visual regression testing
+- [x] `/contract-test` - Pact consumer-driven contracts
+- [x] `/test-data` - Faker.js test data generation
+- [x] Templates: sample.visual.ts, sample.pact.ts, test-data-factory.ts, backstop.config.js
 
-### Chiều (4h)
+### Phase 5: Lighthouse + Docker + Smoke
+- [x] `/lighthouse` - Google Lighthouse web quality audit
+- [x] `/docker-test` - Docker test environment management
+- [x] `/smoke-test` - post-deployment health checks
+- [x] Templates: docker-compose.test.yml, sample.smoke.ts
 
-- [x] **T3.4** Documentation hoàn chỉnh
-  - [x] README.md: hướng dẫn cài đặt skills + usage examples
-  - [x] PLAN.md: reflect Skills approach + architecture
-  - [x] `INSTALL.md`: step-by-step installation guide
-  - [x] `SKILLS.md`: reference cho tất cả skills + examples + workflow cheatsheet
+### Documentation Update
+- [x] CLAUDE.md - updated with all 24 skills
+- [x] README.md - updated with full feature list
+- [x] TODO.md - updated (this file)
+- [ ] SKILLS.md - update with new skills reference
+- [ ] AI-AGENT-GUIDE.md - update with new skills routing
+- [ ] USER-GUIDE.md - update with new skills examples
 
-- [x] **T3.5** Commit & Push
-  - [x] Review tất cả skill files
-  - [x] Commit & push to GitHub
-  - [x] Tag release v0.1.0
-
-**Day 3 Checkpoint**: ✅ DONE
-
----
-
-## File Structure (Final)
-
-```
-test-automation-monitor/
-├── .claude/
-│   └── skills/
-│       ├── setup-test-env/SKILL.md    ✅
-│       ├── devices/SKILL.md           ✅
-│       ├── appium/SKILL.md            ✅
-│       ├── install-apk/SKILL.md       ✅
-│       ├── run-test/SKILL.md          ✅
-│       ├── mobile-test/SKILL.md       ✅
-│       ├── test-report/SKILL.md       ✅
-│       ├── monitor/SKILL.md           ✅
-│       └── scaffold-test/SKILL.md     ✅
-│
-├── scripts/
-│   ├── check-env.sh                   ✅
-│   ├── parse-playwright-results.sh    ✅
-│   ├── parse-wdio-results.sh          ✅
-│   └── parse-k6-results.sh            ✅
-│
-├── templates/
-│   ├── playwright.config.ts           ✅
-│   ├── wdio.conf.ts                   ✅
-│   ├── sample.spec.ts                 ✅
-│   ├── sample.mobile.ts              ✅
-│   └── sample.k6.js                   ✅
-│
-├── CLAUDE.md                          ✅
-├── PLAN.md                            ✅
-├── README.md                          ✅
-├── INSTALL.md                         ✅
-├── SKILLS.md                          ✅
-├── TODO.md                            ✅ (this file)
-└── .gitignore                         ✅
-```
+**v2.0 Total: +16 skills, +15 templates, +3 scripts, +2 docs (USER-GUIDE, AI-AGENT-GUIDE)**
 
 ---
 
 ## Summary
 
-| Day | Focus | Status |
-|-----|-------|--------|
-| **1** | Core Skills + Templates | ✅ COMPLETED |
-| **2** | Mobile + Reports + Monitor | ✅ COMPLETED |
-| **3** | Polish + Docs + Release | ✅ COMPLETED |
+| Version | Skills | Templates | Scripts | Docs |
+|---------|--------|-----------|---------|------|
+| v1.0 | 9 | 5 | 4 | 5 |
+| v2.0 | 24 (+15) | 20+ (+15) | 7 (+3) | 8 (+3) |
 
-**Total: 9 skills, 5 templates, 4 scripts, 5 docs** — all shipped.
+**Grand Total: 24 skills, 20+ templates, 7 scripts, 8 docs**

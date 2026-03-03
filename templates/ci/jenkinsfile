@@ -1,0 +1,90 @@
+pipeline {
+    agent any
+
+    tools {
+        nodejs 'NodeJS-20'
+    }
+
+    environment {
+        CI = 'true'
+        NODE_ENV = 'test'
+    }
+
+    options {
+        timeout(time: 30, unit: 'MINUTES')
+        disableConcurrentBuilds()
+    }
+
+    stages {
+        stage('Install') {
+            steps {
+                sh 'npm ci'
+            }
+        }
+
+        stage('Unit Tests') {
+            steps {
+                sh 'npx vitest run --coverage --reporter=json --outputFile=test-results/unit-results.json'
+            }
+            post {
+                always {
+                    junit 'test-results/junit.xml'
+                    archiveArtifacts artifacts: 'test-results/**', fingerprint: true
+                }
+            }
+        }
+
+        stage('E2E & API Tests') {
+            parallel {
+                stage('E2E Tests') {
+                    steps {
+                        sh 'npx playwright install --with-deps chromium'
+                        sh 'npx playwright test --reporter=json,html,junit'
+                    }
+                    post {
+                        always {
+                            junit 'test-results/results.xml'
+                            archiveArtifacts artifacts: 'playwright-report/**', fingerprint: true
+                        }
+                    }
+                }
+
+                stage('API Tests') {
+                    steps {
+                        sh 'npx playwright test --grep @api --reporter=json'
+                    }
+                    post {
+                        always {
+                            archiveArtifacts artifacts: 'test-results/**', fingerprint: true
+                        }
+                    }
+                }
+            }
+        }
+
+        // stage('Performance Tests') {
+        //     steps {
+        //         sh 'k6 run tests/performance/load.k6.js --out json=test-results/k6-results.json'
+        //     }
+        //     post {
+        //         always {
+        //             archiveArtifacts artifacts: 'test-results/**', fingerprint: true
+        //         }
+        //     }
+        // }
+    }
+
+    post {
+        always {
+            cleanWs()
+        }
+        failure {
+            // Uncomment to enable notifications:
+            // slackSend channel: '#testing', message: "Tests FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}"
+            echo 'Tests failed! Check the reports for details.'
+        }
+        success {
+            echo 'All tests passed!'
+        }
+    }
+}

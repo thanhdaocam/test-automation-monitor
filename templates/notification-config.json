@@ -1,0 +1,30 @@
+{
+  "slack": {
+    "webhookUrl": "",
+    "channel": "#test-results",
+    "username": "Test Bot",
+    "notifyOn": "always"
+  },
+  "teams": {
+    "webhookUrl": "",
+    "notifyOn": "failure"
+  },
+  "discord": {
+    "webhookUrl": "",
+    "notifyOn": "failure"
+  },
+  "email": {
+    "smtp": {
+      "host": "smtp.gmail.com",
+      "port": 587,
+      "secure": false,
+      "auth": {
+        "user": "",
+        "pass": ""
+      }
+    },
+    "from": "testbot@example.com",
+    "to": ["team@example.com"],
+    "notifyOn": "failure"
+  }
+}

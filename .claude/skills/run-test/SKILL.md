@@ -13,7 +13,7 @@ Execute Playwright web tests or k6 performance tests and display formatted resul
 ## Current Project Context
 
 Available test scripts in package.json:
-!`cat package.json 2>/dev/null | node -e "try{const p=JSON.parse(require('fs').readFileSync('/dev/stdin','utf8'));console.log(Object.entries(p.scripts||{}).filter(([k])=>k.includes('test')).map(([k,v])=>k+': '+v).join('\n')||'No test scripts found')}catch{console.log('No package.json found')}" 2>/dev/null`
+!`node -e "try{const p=require('./package.json');const s=Object.entries(p.scripts||{}).filter(([k])=>k.includes('test'));console.log(s.length?s.map(([k,v])=>k+': '+v).join('\n'):'No test scripts found')}catch{console.log('No package.json found')}"`
 
 Test files found:
 !`find . -maxdepth 4 -type f \( -name "*.spec.ts" -o -name "*.test.ts" -o -name "*.k6.js" -o -name "*.spec.js" -o -name "*.test.js" \) 2>/dev/null | head -15 || echo "No test files found"`

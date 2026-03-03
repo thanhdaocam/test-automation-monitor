@@ -1,0 +1,81 @@
+stages:
+  - test
+  - report
+
+variables:
+  NODE_VERSION: "20"
+
+# Cache node_modules between pipelines
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - node_modules/
+    - .cache/
+
+unit-tests:
+  stage: test
+  image: node:${NODE_VERSION}
+  script:
+    - npm ci
+    - npx vitest run --coverage --reporter=json --outputFile=test-results/unit-results.json
+  artifacts:
+    when: always
+    paths:
+      - test-results/
+    reports:
+      junit: test-results/junit.xml
+    expire_in: 30 days
+
+e2e-tests:
+  stage: test
+  image: mcr.microsoft.com/playwright:v1.42.0-jammy
+  needs: ["unit-tests"]
+  script:
+    - npm ci
+    - npx playwright test --reporter=json,html,junit
+  artifacts:
+    when: always
+    paths:
+      - playwright-report/
+      - test-results/
+    reports:
+      junit: test-results/results.xml
+    expire_in: 30 days
+
+api-tests:
+  stage: test
+  image: node:${NODE_VERSION}
+  needs: ["unit-tests"]
+  script:
+    - npm ci
+    - npx playwright test --grep @api --reporter=json
+  variables:
+    BASE_URL: ${API_BASE_URL:-http://localhost:3000}
+  artifacts:
+    when: always
+    paths:
+      - test-results/
+    expire_in: 30 days
+
+# performance-tests:
+#   stage: test
+#   image: grafana/k6:latest
+#   needs: ["e2e-tests", "api-tests"]
+#   script:
+#     - k6 run tests/performance/load.k6.js --out json=test-results/k6-results.json
+#   artifacts:
+#     when: always
+#     paths:
+#       - test-results/
+#     expire_in: 30 days
+
+# pages:
+#   stage: report
+#   needs: ["e2e-tests"]
+#   script:
+#     - mv playwright-report/ public/
+#   artifacts:
+#     paths:
+#       - public
+#   only:
+#     - main
