@@ -1,12 +1,13 @@
 ---
 name: lighthouse
-description: Run Google Lighthouse audits for performance, accessibility, SEO, and best practices. Generates scores and actionable recommendations. Use for any web project to check Core Web Vitals and quality.
+version: 2.0.0
+description: Chạy kiểm toán Google Lighthouse cho hiệu năng, trợ năng, SEO và best practices. Tạo điểm số và gợi ý cải thiện. Dùng cho mọi dự án web để kiểm tra Core Web Vitals.
 allowed-tools: Bash(npx *), Bash(node *), Bash(cat *), Bash(ls *), Bash(mkdir *), Read, Grep, Glob
 user-invocable: true
 argument-hint: <url> [--category performance|accessibility|seo|best-practices|pwa] [--device mobile|desktop] [--budget budget.json]
 ---
 
-# Lighthouse Web Quality Audit
+# Kiểm toán chất lượng web Lighthouse
 
 Run Google Lighthouse to audit web page performance, accessibility, SEO, and best practices.
 
@@ -49,11 +50,25 @@ With specific category:
 npx lighthouse "$URL" --output=json --output-path=test-results/lighthouse-results.json --chrome-flags="--headless --no-sandbox" --only-categories=$category
 ```
 
-**Multiple runs (for stable scores):**
+**Chạy nhiều lần (cho điểm ổn định) — tương thích đa nền tảng:**
+
+**macOS/Linux/Git Bash:**
 ```bash
 for i in $(seq 1 $runs); do
   npx lighthouse "$URL" --output=json --output-path=test-results/lighthouse-run-$i.json --chrome-flags="--headless --no-sandbox"
 done
+```
+
+**Windows (PowerShell):**
+```powershell
+1..$runs | ForEach-Object {
+  npx lighthouse "$URL" --output=json --output-path="test-results/lighthouse-run-$_.json" --chrome-flags="--headless --no-sandbox"
+}
+```
+
+**Windows (CMD) hoặc đa nền tảng (Node.js):**
+```bash
+node -e "const {execSync}=require('child_process');for(let i=1;i<=$runs;i++){console.log('Lần chạy '+i+'/$runs');execSync('npx lighthouse \"$URL\" --output=json --output-path=test-results/lighthouse-run-'+i+'.json --chrome-flags=\"--headless --no-sandbox\"',{stdio:'inherit'})}"
 ```
 
 **Using Lighthouse CI (if config exists):**

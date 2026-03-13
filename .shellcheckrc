@@ -1,0 +1,17 @@
+# .shellcheckrc - ShellCheck configuration for test-automation-monitor
+# See: https://www.shellcheck.net/wiki/
+
+# Allow using source with variable paths (we don't source external files)
+# SC1090: Can't follow non-constant source
+disable=SC1090
+
+# SC1091: Not following sourced file (not found)
+disable=SC1091
+
+# SC2034: Variable appears unused (used in subshells/heredocs)
+# We keep this enabled - fix unused variables instead
+
+# Default shell dialect
+shell=bash
+
+# Treat issues as warnings by default, CI will use --severity=warning

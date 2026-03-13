@@ -1,19 +1,31 @@
 {
+  "__WARNING__": "DO NOT commit this file with real credentials to version control. Only templates/notification-config.json (this template) should be committed. Copy this to your project root and fill in values there.",
+  "__SECURITY_NOTES__": [
+    "1. The root notification-config.json is gitignored — only this template is safe to commit.",
+    "2. Prefer environment variables over hardcoded values: SLACK_WEBHOOK_URL, TEAMS_WEBHOOK_URL, DISCORD_WEBHOOK_URL, SMTP_USER, SMTP_PASS.",
+    "3. Rotate webhook URLs periodically and immediately if they are exposed in logs or commits.",
+    "4. For CI/CD: use pipeline secrets (GitHub Secrets, GitLab CI Variables) instead of this config file.",
+    "5. Use app-specific passwords for SMTP auth (e.g., Gmail App Passwords), never your primary account password."
+  ],
   "slack": {
+    "__WARNING__": "Set SLACK_WEBHOOK_URL env var instead of hardcoding the URL here. Never commit real webhook URLs.",
     "webhookUrl": "",
     "channel": "#test-results",
     "username": "Test Bot",
     "notifyOn": "always"
   },
   "teams": {
+    "__WARNING__": "Set TEAMS_WEBHOOK_URL env var instead of hardcoding the URL here. Never commit real webhook URLs.",
     "webhookUrl": "",
     "notifyOn": "failure"
   },
   "discord": {
+    "__WARNING__": "Set DISCORD_WEBHOOK_URL env var instead of hardcoding the URL here. Never commit real webhook URLs.",
     "webhookUrl": "",
     "notifyOn": "failure"
   },
   "email": {
+    "__WARNING__": "Set SMTP_USER and SMTP_PASS env vars instead of hardcoding credentials here. Use app-specific passwords, never your primary account password.",
     "smtp": {
       "host": "smtp.gmail.com",
       "port": 587,

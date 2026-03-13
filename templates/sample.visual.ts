@@ -34,9 +34,9 @@ test.describe('Visual Regression - Desktop', () => {
   test('Dashboard', async ({ page }) => {
     // Login first
     await page.goto(`${BASE_URL}/login`);
-    await page.fill('[data-testid="email"]', 'user@example.com');
-    await page.fill('[data-testid="password"]', 'password123');
-    await page.click('[data-testid="submit"]');
+    await page.locator('[data-testid="email"]').fill('user@example.com');
+    await page.locator('[data-testid="password"]').fill('password123');
+    await page.locator('[data-testid="submit"]').click();
     await page.waitForURL('**/dashboard');
 
     // Hide dynamic content before screenshot

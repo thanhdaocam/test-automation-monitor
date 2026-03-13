@@ -1,12 +1,13 @@
 ---
 name: flutter-test
-description: Run Flutter unit, widget, and integration tests. Supports flutter test, flutter drive, and patrol. Use for Flutter mobile and web projects.
+version: 2.0.0
+description: Chạy kiểm thử Flutter đơn vị, widget và tích hợp. Hỗ trợ flutter test, flutter drive và patrol. Dùng cho dự án Flutter di động và web.
 allowed-tools: Bash(flutter *), Bash(dart *), Bash(patrol *), Bash(cat *), Bash(ls *), Read, Grep, Glob
 user-invocable: true
 argument-hint: [test-file-or-dir] [--integration] [--device device-id] [--coverage] [--update-goldens]
 ---
 
-# Flutter Testing
+# Kiểm thử Flutter
 
 Execute Flutter unit, widget, and integration tests.
 
@@ -15,11 +16,11 @@ Execute Flutter unit, widget, and integration tests.
 Flutter project detection:
 !`ls pubspec.yaml 2>/dev/null && echo "Flutter project found" || echo "No Flutter project (no pubspec.yaml)"`
 
-Flutter test files:
-!`find . -maxdepth 5 -type f -name "*_test.dart" 2>/dev/null | head -15 || echo "No Flutter test files found"`
+Tệp kiểm thử Flutter:
+!`node -e "const fs=require('fs');const path=require('path');function walk(d,depth,max){let r=[];if(depth>max)return r;try{for(const f of fs.readdirSync(d)){if(f.startsWith('.'))continue;const p=path.join(d,f);try{const s=fs.statSync(p);if(s.isDirectory()&&f!=='node_modules')r=r.concat(walk(p,depth+1,max));else if(f.endsWith('_test.dart'))r.push(p)}catch{}}}catch{}return r}const files=walk('.',0,5);console.log(files.length?files.join('\n'):'Không tìm thấy tệp kiểm thử Flutter')"`
 
-Integration test files:
-!`find . -maxdepth 5 -path "*/integration_test/*" -name "*_test.dart" 2>/dev/null | head -10 || echo "No integration tests found"`
+Tệp kiểm thử tích hợp:
+!`node -e "const fs=require('fs');const path=require('path');function walk(d,depth,max){let r=[];if(depth>max)return r;try{for(const f of fs.readdirSync(d)){if(f.startsWith('.'))continue;const p=path.join(d,f);try{const s=fs.statSync(p);if(s.isDirectory()&&f!=='node_modules')r=r.concat(walk(p,depth+1,max));else if(f.endsWith('_test.dart')&&p.includes('integration_test'))r.push(p)}catch{}}}catch{}return r}const files=walk('.',0,5);console.log(files.length?files.join('\n'):'Không tìm thấy tệp kiểm thử tích hợp')"`
 
 ## Parse Arguments
 

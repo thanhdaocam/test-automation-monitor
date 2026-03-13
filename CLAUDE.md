@@ -2,7 +2,9 @@
 
 ## What is this?
 
-A comprehensive set of **24 Claude Code Skills** (slash commands) for automation testing across Web, Mobile, API, Unit, Performance, Security, Visual, and more.
+A comprehensive set of **25 Claude Code Skills** (slash commands) for automation testing across Web, Mobile, API, Unit, Performance, Security, Visual, and more.
+
+**Current version**: v2.1.0 — See [CHANGELOG.md](CHANGELOG.md) for version history.
 
 ## Available Skills
 

@@ -1,19 +1,20 @@
 ---
 name: a11y-test
-description: Run accessibility tests to check WCAG 2.2 compliance. Uses axe-core with Playwright for automated a11y scanning. Reports violations with severity, impact, and fix suggestions. Use for any web project.
+version: 2.0.0
+description: Chạy kiểm thử trợ năng theo chuẩn WCAG 2.2. Dùng axe-core với Playwright để quét tự động. Báo cáo vi phạm kèm mức nghiêm trọng, tác động và gợi ý sửa. Dùng cho mọi dự án web.
 allowed-tools: Bash(npx *), Bash(node *), Bash(cat *), Bash(ls *), Read, Grep, Glob
 user-invocable: true
 argument-hint: <url-or-test-file> [--standard wcag2a|wcag2aa|wcag2aaa] [--include selector] [--exclude selector]
 ---
 
-# Accessibility Testing (WCAG)
+# Kiểm thử trợ năng (WCAG)
 
 Scan web pages for accessibility violations using axe-core integrated with Playwright.
 
 ## Current Project Context
 
-Accessibility test files:
-!`find . -maxdepth 4 -type f \( -name "*.a11y.ts" -o -name "*.a11y.js" -o -name "*.accessibility.*" \) 2>/dev/null | head -10 || echo "No a11y test files found"`
+Tệp kiểm thử trợ năng:
+!`node -e "const fs=require('fs');const path=require('path');function walk(d,depth,max){let r=[];if(depth>max)return r;try{for(const f of fs.readdirSync(d)){if(f.startsWith('.'))continue;const p=path.join(d,f);try{const s=fs.statSync(p);if(s.isDirectory()&&f!=='node_modules')r=r.concat(walk(p,depth+1,max));else if(/\.a11y\.(ts|js)$/.test(f)||/\.accessibility\./.test(f))r.push(p)}catch{}}}catch{}return r}const files=walk('.',0,4);console.log(files.length?files.join('\n'):'Không tìm thấy tệp kiểm thử trợ năng')"`
 
 axe-core availability:
 !`node -e "try{const p=require('./package.json');const d={...p.dependencies,...p.devDependencies};if(d['@axe-core/playwright']||d['axe-core']||d['pa11y'])console.log('axe-core: installed');else console.log('axe-core: not installed')}catch{console.log('No package.json')}" 2>/dev/null`

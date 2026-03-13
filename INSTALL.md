@@ -130,6 +130,7 @@ Skills are automatically discovered by Claude Code from `.claude/skills/`.
 
 ### Option B: Copy skills into existing project
 
+**macOS/Linux:**
 ```bash
 # Clone the repo
 git clone https://github.com/thanhdaocam/test-automation-monitor.git
@@ -142,15 +143,55 @@ cp -r test-automation-monitor/scripts/ /path/to/your-project/scripts/
 cp -r test-automation-monitor/templates/ /path/to/your-project/templates/
 ```
 
+**Windows (CMD):**
+```cmd
+:: Clone the repo
+git clone https://github.com/thanhdaocam/test-automation-monitor.git
+
+:: Copy skills to your project
+xcopy /E /I test-automation-monitor\.claude\skills your-project\.claude\skills
+
+:: Optionally copy helper scripts and templates
+xcopy /E /I test-automation-monitor\scripts your-project\scripts
+xcopy /E /I test-automation-monitor\templates your-project\templates
+```
+
+**Windows (PowerShell):**
+```powershell
+# Clone the repo
+git clone https://github.com/thanhdaocam/test-automation-monitor.git
+
+# Copy skills to your project
+Copy-Item -Recurse -Force test-automation-monitor\.claude\skills\ your-project\.claude\skills\
+
+# Optionally copy helper scripts and templates
+Copy-Item -Recurse -Force test-automation-monitor\scripts\ your-project\scripts\
+Copy-Item -Recurse -Force test-automation-monitor\templates\ your-project\templates\
+```
+
 ### Option C: Git submodule
 
 ```bash
 cd your-project
 git submodule add https://github.com/thanhdaocam/test-automation-monitor.git .test-tools
+```
 
-# Symlink skills
+**macOS/Linux:** Tạo symlink:
+```bash
 ln -s .test-tools/.claude/skills .claude/skills
 ```
+
+**Windows (CMD với quyền Admin):** Tạo symlink:
+```cmd
+mklink /D .claude\skills .test-tools\.claude\skills
+```
+
+**Windows (PowerShell với quyền Admin):**
+```powershell
+New-Item -ItemType SymbolicLink -Path .claude\skills -Target .test-tools\.claude\skills
+```
+
+> **Lưu ý Windows:** Tạo symlink trên Windows yêu cầu quyền Administrator hoặc bật Developer Mode (Cài đặt > Cập nhật & Bảo mật > Dành cho nhà phát triển).
 
 ## Verify Installation
 
@@ -242,3 +283,60 @@ npx playwright install
 ### "Java not found" (Appium needs it)
 - Install Java 11+: `winget install Microsoft.OpenJDK.17`
 - Make sure `JAVA_HOME` is set and Java is in PATH
+
+## Hướng dẫn dành riêng cho Windows
+
+### Script PowerShell thay thế
+
+Dự án bao gồm các script PowerShell tương đương cho Windows:
+
+| Script Bash (macOS/Linux) | Script PowerShell (Windows) | Mô tả |
+|---|---|---|
+| `scripts/check-env.sh` | `scripts/check-env.ps1` | Kiểm tra môi trường |
+| `scripts/parse-playwright-results.sh` | `scripts/parse-playwright-results.ps1` | Phân tích kết quả Playwright |
+
+**Chạy script PowerShell:**
+```powershell
+# Cho phép chạy script (chỉ cần 1 lần)
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
+
+# Kiểm tra môi trường
+pwsh scripts/check-env.ps1
+
+# Phân tích kết quả Playwright
+pwsh scripts/parse-playwright-results.ps1 test-results/playwright-results.json
+```
+
+### Yêu cầu Git Bash cho script .sh
+
+Các script `.sh` khác yêu cầu **Git Bash** (được cài sẵn với Git for Windows):
+
+```bash
+# Chạy bằng Git Bash
+bash scripts/parse-k6-results.sh test-results/k6-output.json
+bash scripts/parse-wdio-results.sh test-results/wdio-results.json
+```
+
+### Bảng tương đương lệnh Windows
+
+| Lệnh Unix | Windows CMD | PowerShell | Git Bash |
+|---|---|---|---|
+| `which node` | `where node` | `Get-Command node` | `which node` |
+| `lsof -i :4723` | `netstat -ano \| findstr :4723` | `Get-NetTCPConnection -LocalPort 4723` | `lsof -i :4723` |
+| `kill -9 <PID>` | `taskkill /PID <PID> /F` | `Stop-Process -Id <PID> -Force` | `kill -9 <PID>` |
+| `grep pattern file` | `findstr "pattern" file` | `Select-String -Pattern "pattern" file` | `grep pattern file` |
+| `/tmp/file.log` | `%TEMP%\file.log` | `$env:TEMP\file.log` | `/tmp/file.log` |
+| `$HOME` | `%USERPROFILE%` | `$env:USERPROFILE` | `$HOME` |
+| `echo $ANDROID_HOME` | `echo %ANDROID_HOME%` | `$env:ANDROID_HOME` | `echo $ANDROID_HOME` |
+| `find . -name "*.ts"` | `dir /s /b *.ts` | `Get-ChildItem -Recurse -Filter *.ts` | `find . -name "*.ts"` |
+
+### Cách chạy khuyên dùng trên Windows
+
+**Ưu tiên 1 — Git Bash:** Nếu đã cài Git for Windows, mở **Git Bash** và mọi lệnh Unix trong tài liệu đều hoạt động trực tiếp.
+
+**Ưu tiên 2 — PowerShell 7+ (pwsh):** Dùng cho các script `.ps1` có sẵn. Cài đặt: `winget install Microsoft.PowerShell`.
+
+**Ưu tiên 3 — Windows CMD:** Sử dụng bảng tương đương ở trên để chuyển đổi lệnh.
+
+> **Lưu ý quan trọng:** Kiểm thử iOS (iPhone/iPad) **không khả dụng trên Windows**. Chỉ có thể kiểm thử iOS trên macOS.
+

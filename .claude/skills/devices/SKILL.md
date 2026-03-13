@@ -1,86 +1,90 @@
 ---
 name: devices
-description: List all connected Android and iOS devices and emulators. Shows device ID, model, OS version, and connection status. Use this to see what devices are available for mobile testing.
-allowed-tools: Bash(adb *), Bash(idevice_id *), Bash(ideviceinfo *), Bash(xcrun *)
+version: 1.0.0
+description: Liệt kê tất cả thiết bị Android và iOS đã kết nối cùng trình giả lập. Hiển thị ID thiết bị, model, phiên bản OS và trạng thái kết nối. Dùng để xem thiết bị nào khả dụng cho kiểm thử di động.
+allowed-tools: Bash(adb *), Bash(idevice_id *), Bash(ideviceinfo *), Bash(xcrun *), Bash(node *)
 user-invocable: true
 ---
 
-# List Connected Devices
+# Liệt kê thiết bị kết nối
 
-Discover and display all connected Android and iOS devices/emulators.
+Phát hiện và hiển thị tất cả thiết bị/trình giả lập Android và iOS đã kết nối.
 
-## Current Device Status
+## Trạng thái thiết bị hiện tại
 
-!`adb devices -l 2>/dev/null || echo "ADB not available"`
+!`adb devices -l 2>/dev/null || echo "ADB không khả dụng"`
 
-## Steps
+## Các bước
 
-1. **Check ADB is available**:
+1. **Kiểm tra ADB có sẵn**:
    ```bash
    adb version 2>/dev/null
    ```
-   If not found, tell the user: "ADB not found. Run `/setup-test-env` to install prerequisites."
+   Nếu không tìm thấy, báo người dùng: "Không tìm thấy ADB. Chạy `/setup-test-env` để cài đặt tiền điều kiện."
 
-2. **Start ADB server** (if not running):
+2. **Khởi động ADB server** (nếu chưa chạy):
    ```bash
    adb start-server 2>/dev/null
    ```
 
-3. **List Android devices**:
+3. **Liệt kê thiết bị Android**:
    ```bash
    adb devices -l
    ```
-   For each device found, get details:
+   Cho mỗi thiết bị tìm thấy, lấy thông tin chi tiết:
    ```bash
    adb -s <device_id> shell getprop ro.product.model
    adb -s <device_id> shell getprop ro.build.version.release
    adb -s <device_id> shell getprop ro.product.brand
    ```
 
-4. **List iOS devices** (only on macOS, skip on Windows/Linux without error):
+4. **Liệt kê thiết bị iOS** (chỉ trên macOS, bỏ qua trên Windows/Linux mà không báo lỗi):
    ```bash
    idevice_id -l 2>/dev/null
    ```
-   If found, get details:
+   Nếu tìm thấy, lấy thông tin chi tiết:
    ```bash
    ideviceinfo -u <udid> -k DeviceName 2>/dev/null
    ideviceinfo -u <udid> -k ProductVersion 2>/dev/null
    ideviceinfo -u <udid> -k ProductType 2>/dev/null
    ```
 
-5. **Also check for iOS simulators** (macOS only):
+5. **Kiểm tra trình giả lập iOS** (chỉ macOS, bỏ qua trên Windows):
    ```bash
-   xcrun simctl list devices available 2>/dev/null | grep -E "Booted|Shutdown"
+   xcrun simctl list devices available 2>/dev/null
    ```
+   Lọc kết quả hiển thị trạng thái "Booted" hoặc "Shutdown" từ đầu ra.
 
-6. **Display results** as a formatted table:
+   > **Lưu ý Windows:** Các lệnh iOS (`idevice_id`, `xcrun simctl`) không khả dụng trên Windows. Bỏ qua phần iOS mà không báo lỗi.
+
+6. **Hiển thị kết quả** dưới dạng bảng có định dạng:
    ```
-   Connected Devices
+   Thiết bị kết nối
    ══════════════════════════════════════════════════════════════
-   #  Device ID         Platform    Model         OS       Status
+   #  ID thiết bị       Nền tảng    Model         OS       Trạng thái
    ──────────────────────────────────────────────────────────────
-   1  emulator-5554     Android     Pixel 7       14       online
-   2  R5CT32XXXXX       Android     Galaxy S23    13       online
-   3  00008101-XXXX     iOS         iPhone 15     17.4     online
+   1  emulator-5554     Android     Pixel 7       14       trực tuyến
+   2  R5CT32XXXXX       Android     Galaxy S23    13       trực tuyến
+   3  00008101-XXXX     iOS         iPhone 15     17.4     trực tuyến
    ══════════════════════════════════════════════════════════════
-   Total: 3 devices (3 online, 0 offline)
+   Tổng cộng: 3 thiết bị (3 trực tuyến, 0 ngoại tuyến)
    ```
 
-7. **If no devices found**, provide helpful guidance:
-   - Android: "Connect a device via USB with USB Debugging enabled, or start an emulator from Android Studio."
-   - iOS: "Connect an iPhone via USB and trust the computer, or boot a simulator with `xcrun simctl boot <device>`."
+7. **Nếu không tìm thấy thiết bị**, cung cấp hướng dẫn:
+   - Android: "Kết nối thiết bị qua USB với USB Debugging đã bật, hoặc khởi động trình giả lập từ Android Studio."
+   - iOS: "Kết nối iPhone qua USB và tin cậy máy tính, hoặc khởi động simulator với `xcrun simctl boot <device>`."
 
-8. **Tip**: Mention that the user can use a specific device with `/mobile-test --device <id>` or `/install-apk <apk> <device_id>`.
+8. **Mẹo**: Gợi ý người dùng có thể chỉ định thiết bị cụ thể với `/mobile-test --device <id>` hoặc `/install-apk <apk> <device_id>`.
 
-## Error Recovery
+## Xử lý lỗi
 
-- If `adb` not found: suggest running `/setup-test-env` first.
-- If `adb devices` returns "daemon not running": ADB will auto-start, wait and retry.
-- If device shows "unauthorized": tell user to check the USB debugging prompt on the device screen.
-- If device shows "offline": suggest `adb kill-server && adb start-server`.
+- Nếu không tìm thấy `adb`: gợi ý chạy `/setup-test-env` trước.
+- Nếu `adb devices` trả về "daemon not running": ADB sẽ tự khởi động, đợi và thử lại.
+- Nếu thiết bị hiện "unauthorized": báo người dùng kiểm tra thông báo USB debugging trên màn hình thiết bị.
+- Nếu thiết bị hiện "offline": gợi ý `adb kill-server && adb start-server`.
 
-## Related Skills
+## Kỹ năng liên quan
 
-- Install an app: `/install-apk <path.apk> <device_id>`
-- Run mobile test: `/mobile-test <file> --device <device_id>`
-- Start Appium: `/appium start`
+- Cài đặt ứng dụng: `/install-apk <path.apk> <device_id>`
+- Chạy kiểm thử di động: `/mobile-test <file> --device <device_id>`
+- Khởi động Appium: `/appium start`

@@ -1,7 +1,7 @@
 # AI Agent Guide - Test Automation Skill Router
 
 > **Purpose**: This document is a structured reference for AI agents. Given a user's test request, use this guide to determine the correct skill(s) to invoke, in what order, and with what parameters.
-> **Version**: 2.0 | **Total Skills**: 24
+> **Version**: 2.0 | **Total Skills**: 25
 
 ---
 
@@ -572,7 +572,7 @@ Error occurred
 ## Version Information
 
 - **Skills version**: 2.0.0
-- **Total skills**: 24
+- **Total skills**: 25
 - **Supported frameworks**: Playwright, Cypress, Vitest, Jest, WebdriverIO, Appium, k6, Flutter, Detox, Pact, BackstopJS, axe-core, Lighthouse
 - **Supported platforms**: Windows, macOS, Linux
 - **Required**: Node.js 20+, Claude Code CLI

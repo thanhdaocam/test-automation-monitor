@@ -29,9 +29,9 @@ test.describe('@smoke Critical Path', () => {
 
   test('Login flow works', async ({ page }) => {
     await page.goto(`${BASE_URL}/login`);
-    await page.fill('[data-testid="email"], #email, [name="email"]', 'user@example.com');
-    await page.fill('[data-testid="password"], #password, [name="password"]', 'password123');
-    await page.click('[type="submit"]');
+    await page.locator('[data-testid="email"], #email, [name="email"]').fill('user@example.com');
+    await page.locator('[data-testid="password"], #password, [name="password"]').fill('password123');
+    await page.locator('[type="submit"]').click();
 
     // Should redirect to dashboard or home
     await page.waitForURL(/\/(dashboard|home|$)/, { timeout: 10000 });

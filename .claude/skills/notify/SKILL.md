@@ -1,23 +1,24 @@
 ---
 name: notify
-description: Send test results as notifications to Slack, Microsoft Teams, Discord, or Email. Configure webhook URLs and send pass/fail summaries after test runs.
+version: 2.0.0
+description: Gửi kết quả kiểm thử dưới dạng thông báo tới Slack, Microsoft Teams, Discord hoặc Email. Cấu hình webhook URL và gửi tóm tắt đạt/lỗi sau mỗi lần chạy kiểm thử.
 allowed-tools: Bash(curl *), Bash(node *), Bash(npx *), Bash(cat *), Bash(ls *), Read, Write, Grep, Glob
 user-invocable: true
 argument-hint: <slack|teams|discord|email> [--webhook-url url] [--results-file path] [--channel name]
 disable-model-invocation: true
 ---
 
-# Test Result Notifications
+# Thông báo kết quả kiểm thử
 
 Send test results to team communication channels.
 
 ## Current Project Context
 
-Notification config:
-!`cat notification-config.json 2>/dev/null || echo "No notification config found. Run /notify with --webhook-url to configure."`
+Cấu hình thông báo:
+!`node -e "try{const fs=require('fs');console.log(fs.readFileSync('notification-config.json','utf8'))}catch{console.log('Chưa tìm thấy cấu hình thông báo. Chạy /notify với --webhook-url để cấu hình.')}"`
 
-Latest test results:
-!`ls -t test-results/*.json 2>/dev/null | head -3 || echo "No test results found"`
+Kết quả kiểm thử gần nhất:
+!`node -e "const fs=require('fs');const path=require('path');try{const files=fs.readdirSync('test-results').filter(f=>f.endsWith('.json')).map(f=>({name:f,time:fs.statSync(path.join('test-results',f)).mtime})).sort((a,b)=>b.time-a.time).slice(0,3);console.log(files.length?files.map(f=>'test-results/'+f.name).join('\n'):'Không tìm thấy kết quả kiểm thử')}catch{console.log('Không tìm thấy kết quả kiểm thử')}"`
 
 ## Parse Arguments
 
@@ -147,6 +148,21 @@ Content:   Test Results: smoke-tests
 - If no test results found: suggest running tests first with `/run-test`
 - If nodemailer not installed (email): suggest `npm install nodemailer`
 - For rate limiting: suggest reducing notification frequency
+
+## Security Best Practices
+
+> **⚠ CRITICAL: Never commit webhook URLs or SMTP credentials to version control.**
+
+- **Use environment variables** for all sensitive values (webhook URLs, SMTP passwords, API tokens):
+  - `SLACK_WEBHOOK_URL` instead of hardcoding in `notification-config.json`
+  - `SMTP_PASS` instead of plaintext passwords in config
+  - `TEAMS_WEBHOOK_URL`, `DISCORD_WEBHOOK_URL` for other platforms
+- **`notification-config.json` is gitignored** — only `templates/notification-config.json` (the empty template) should be committed. If you find a `notification-config.json` with real credentials in your repo, rotate those credentials immediately.
+- **Rotate webhook URLs** periodically, especially if team members leave or URLs are shared in logs.
+- **Limit webhook permissions** — use channels/rooms dedicated to test results, not general channels.
+- **For CI/CD pipelines**: store webhook URLs and SMTP credentials as encrypted secrets (GitHub Secrets, GitLab CI Variables, Azure Key Vault), never in pipeline YAML files.
+- **Audit notification configs** before sharing repos — run `git log --all -p -- notification-config.json` to check if credentials were ever committed.
+- **Use app-specific passwords** for email SMTP (e.g., Gmail App Passwords) rather than your primary account password.
 
 ## Related Skills
 

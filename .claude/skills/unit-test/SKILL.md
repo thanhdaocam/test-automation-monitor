@@ -1,12 +1,13 @@
 ---
 name: unit-test
-description: Run unit and component tests. Auto-detects framework (Jest, Vitest, pytest, go test, PHPUnit) from project config. Shows pass/fail results with coverage. Use for any project with unit tests.
+version: 2.0.0
+description: Chạy kiểm thử đơn vị và component. Tự phát hiện framework (Jest, Vitest, pytest, go test, PHPUnit) từ cấu hình dự án. Hiển thị kết quả đạt/lỗi kèm độ phủ mã. Dùng cho mọi dự án có kiểm thử đơn vị.
 allowed-tools: Bash(npx *), Bash(node *), Bash(pytest *), Bash(python *), Bash(go *), Bash(php *), Bash(cat *), Bash(ls *), Read, Grep, Glob
 user-invocable: true
 argument-hint: [test-file-or-pattern] [--coverage] [--watch] [--filter pattern]
 ---
 
-# Unit Testing
+# Kiểm thử đơn vị
 
 Execute unit and component tests with auto-framework detection.
 
@@ -144,6 +145,13 @@ Coverage: 78.5% statements, 65.2% branches
 - If `--coverage`, show coverage summary (statements, branches, functions, lines)
 - If failures, show error details with file:line
 - Suggest: "Use `--watch` for continuous testing during development"
+
+## Lưu ý tương thích đa nền tảng
+
+- Các lệnh `ls ... 2>/dev/null` hoạt động trong Git Bash trên Windows. Trên PowerShell thuần, dùng `Get-ChildItem -ErrorAction SilentlyContinue`.
+- Script phân tích kết quả Jest/Vitest có sẵn cả hai phiên bản:
+  - **macOS/Linux/Git Bash:** `bash scripts/parse-jest-results.sh test-results/jest-results.json`
+  - **Windows (PowerShell):** `powershell -ExecutionPolicy Bypass -File scripts/parse-jest-results.ps1 test-results/jest-results.json`
 
 ## Error Recovery
 

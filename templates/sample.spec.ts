@@ -13,18 +13,18 @@ test.describe('Login Page', () => {
   });
 
   test('should login with valid credentials', async ({ page }) => {
-    await page.fill('input[name="email"]', 'user@example.com');
-    await page.fill('input[name="password"]', 'password123');
-    await page.click('button[type="submit"]');
+    await page.locator('input[name="email"]').fill('user@example.com');
+    await page.locator('input[name="password"]').fill('password123');
+    await page.locator('button[type="submit"]').click();
 
     await expect(page).toHaveURL('/dashboard');
     await expect(page.locator('h1')).toContainText('Dashboard');
   });
 
   test('should show error for invalid credentials', async ({ page }) => {
-    await page.fill('input[name="email"]', 'wrong@example.com');
-    await page.fill('input[name="password"]', 'wrongpass');
-    await page.click('button[type="submit"]');
+    await page.locator('input[name="email"]').fill('wrong@example.com');
+    await page.locator('input[name="password"]').fill('wrongpass');
+    await page.locator('button[type="submit"]').click();
 
     await expect(page.locator('.error-message')).toBeVisible();
     await expect(page.locator('.error-message')).toContainText(
@@ -33,13 +33,13 @@ test.describe('Login Page', () => {
   });
 
   test('should validate required fields', async ({ page }) => {
-    await page.click('button[type="submit"]');
+    await page.locator('button[type="submit"]').click();
 
     await expect(page.locator('input[name="email"]:invalid')).toBeVisible();
   });
 
   test('should navigate to register page', async ({ page }) => {
-    await page.click('a[href="/register"]');
+    await page.locator('a[href="/register"]').click();
     await expect(page).toHaveURL('/register');
   });
 });

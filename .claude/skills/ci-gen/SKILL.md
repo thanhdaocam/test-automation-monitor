@@ -1,13 +1,14 @@
 ---
 name: ci-gen
-description: Generate CI/CD pipeline configuration for your test suite. Supports GitHub Actions, GitLab CI, Jenkins, and Azure Pipelines. Auto-detects project type and creates appropriate pipeline config.
+version: 2.0.0
+description: Tạo cấu hình pipeline CI/CD cho bộ kiểm thử. Hỗ trợ GitHub Actions, GitLab CI, Jenkins và Azure Pipelines. Tự phát hiện loại dự án và tạo cấu hình pipeline phù hợp.
 allowed-tools: Bash(cat *), Bash(ls *), Bash(node *), Bash(mkdir *), Read, Write, Grep, Glob
 user-invocable: true
 argument-hint: <github|gitlab|jenkins|azure> [--test-type web|mobile|api|unit|performance|all]
 disable-model-invocation: true
 ---
 
-# CI/CD Pipeline Generator
+# Trình tạo pipeline CI/CD
 
 Generate CI/CD pipeline configuration files for automated test execution.
 

@@ -1,19 +1,20 @@
 ---
 name: smoke-test
-description: Run quick smoke tests to verify critical functionality after deployment. Executes a subset of critical tests across all frameworks. Use for post-deployment health checks and production verification.
+version: 2.0.0
+description: Chạy kiểm thử smoke nhanh để xác minh chức năng quan trọng sau triển khai. Thực thi tập con kiểm thử quan trọng trên tất cả framework. Dùng cho kiểm tra sức khỏe hậu triển khai.
 allowed-tools: Bash(npx *), Bash(node *), Bash(curl *), Bash(cat *), Bash(ls *), Read, Grep, Glob
 user-invocable: true
 argument-hint: [--env staging|production|local] [--url base-url] [--timeout 30s] [--tag @smoke]
 ---
 
-# Smoke Testing
+# Kiểm thử Smoke
 
 Run quick critical-path tests to verify a deployment is working.
 
 ## Current Project Context
 
-Smoke-tagged tests:
-!`grep -rn --include="*.{ts,js}" -l "@smoke\|\.tag.*smoke\|describe.*smoke\|test.*smoke" tests/ test/ e2e/ cypress/ 2>/dev/null | head -10 || echo "No smoke-tagged tests found"`
+Tệp kiểm thử smoke:
+!`node -e "const {execSync}=require('child_process');const dirs=['tests','test','e2e','cypress'];let found=[];for(const d of dirs){try{const r=execSync(process.platform==='win32'?'findstr /s /l /m \"smoke\" '+d+'\\\\*.ts '+d+'\\\\*.js 2>nul':'grep -rn --include=\"*.ts\" --include=\"*.js\" -l \"smoke\" '+d+' 2>/dev/null',{encoding:'utf8',timeout:5000});if(r.trim())found.push(...r.trim().split('\\n'))}catch{}}console.log(found.length?found.slice(0,10).join('\\n'):'Không tìm thấy tệp kiểm thử smoke')"`
 
 Test config:
 !`node -e "try{const p=require('./package.json');if(p.scripts&&p.scripts['test:smoke'])console.log('Smoke script: '+p.scripts['test:smoke']);else console.log('No smoke test script in package.json')}catch{}" 2>/dev/null`

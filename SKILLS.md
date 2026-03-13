@@ -1,6 +1,6 @@
 # Skills Reference
 
-Complete reference for all 24 Claude Code Skills in this project.
+Complete reference for all 25 Claude Code Skills in this project.
 
 ---
 

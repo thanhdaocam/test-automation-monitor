@@ -1,35 +1,36 @@
 ---
 name: run-test
-description: Run Playwright web tests or k6 performance tests. Auto-detects the test framework from file extension or package.json. Shows results with pass/fail summary. Use for web browser testing and load testing.
+version: 1.0.0
+description: Chạy kiểm thử Playwright web hoặc kiểm thử hiệu năng k6. Tự phát hiện framework kiểm thử từ phần mở rộng tệp hoặc package.json. Hiển thị kết quả đạt/lỗi. Dùng cho kiểm thử trình duyệt web và kiểm thử tải.
 allowed-tools: Bash(npx *), Bash(k6 *), Bash(node *), Bash(cat *), Bash(ls *), Read, Grep, Glob
 user-invocable: true
 argument-hint: [test-file-or-pattern] [--headed] [--debug] [--grep pattern] [--workers n]
 ---
 
-# Run Tests
+# Chạy kiểm thử
 
-Execute Playwright web tests or k6 performance tests and display formatted results.
+Thực thi kiểm thử Playwright web hoặc kiểm thử hiệu năng k6 và hiển thị kết quả có định dạng.
 
-## Current Project Context
+## Ngữ cảnh dự án hiện tại
 
-Available test scripts in package.json:
-!`node -e "try{const p=require('./package.json');const s=Object.entries(p.scripts||{}).filter(([k])=>k.includes('test'));console.log(s.length?s.map(([k,v])=>k+': '+v).join('\n'):'No test scripts found')}catch{console.log('No package.json found')}"`
+Script kiểm thử trong package.json:
+!`node -e "try{const p=require('./package.json');const s=Object.entries(p.scripts||{}).filter(([k])=>k.includes('test'));console.log(s.length?s.map(([k,v])=>k+': '+v).join('\n'):'Không tìm thấy script kiểm thử')}catch{console.log('Không tìm thấy package.json')}"`
 
-Test files found:
-!`find . -maxdepth 4 -type f \( -name "*.spec.ts" -o -name "*.test.ts" -o -name "*.k6.js" -o -name "*.spec.js" -o -name "*.test.js" \) 2>/dev/null | head -15 || echo "No test files found"`
+Tệp kiểm thử tìm thấy:
+!`node -e "const fs=require('fs');const path=require('path');function walk(d,depth,max){let r=[];if(depth>max)return r;try{for(const f of fs.readdirSync(d)){if(f.startsWith('.'))continue;const p=path.join(d,f);try{const s=fs.statSync(p);if(s.isDirectory()&&f!=='node_modules')r=r.concat(walk(p,depth+1,max));else if(/\.(spec|test)\.(ts|js)$/.test(f)||/\.k6\.js$/.test(f))r.push(p)}catch{}}}catch{}return r}const files=walk('.',0,4);console.log(files.length?files.join('\n'):'Không tìm thấy tệp kiểm thử')"`
 
-## Parse Arguments
+## Phân tích tham số
 
-- `$0` = test file, pattern, or directory (optional, runs all if omitted)
-- `--headed` = run Playwright in headed mode (show browser)
-- `--debug` = run in debug mode
-- `--grep <pattern>` = filter tests by name
-- `--workers <n>` = number of parallel workers (Playwright)
-- All other flags are passed through to the test runner.
+- `$0` = tệp kiểm thử, mẫu, hoặc thư mục (tùy chọn, chạy tất cả nếu bỏ qua)
+- `--headed` = chạy Playwright ở chế độ có giao diện (hiển thị trình duyệt)
+- `--debug` = chạy ở chế độ gỡ lỗi
+- `--grep <pattern>` = lọc kiểm thử theo tên
+- `--workers <n>` = số worker song song (Playwright)
+- Các cờ khác được truyền trực tiếp đến trình chạy kiểm thử.
 
-## Steps
+## Các bước
 
-### 1. Detect Test Framework
+### 1. Phát hiện framework kiểm thử
 
 Determine which runner to use based on:
 
@@ -43,7 +44,7 @@ Determine which runner to use based on:
 
 **By package.json** (if no file specified):
 ```bash
-cat package.json 2>/dev/null | grep -E "playwright|@playwright/test"
+node -e "try{const p=JSON.parse(require('fs').readFileSync('package.json','utf8'));if(JSON.stringify(p).includes('playwright'))console.log('Playwright detected');else console.log('Not found')}catch{console.log('No package.json')}"
 ```
 If Playwright found, run Playwright. If neither detected, ask the user.
 
@@ -87,10 +88,20 @@ If tests fail, show:
 
 ### 3. Run k6 Performance Tests
 
-Build the command:
+Build the command (sử dụng đường dẫn tạm tương thích đa nền tảng):
+
+**Trên mọi nền tảng (dùng Node.js để xác định thư mục tạm):**
 ```bash
-k6 run $test_file --out json=/tmp/k6-results.json --summary-trend-stats="avg,min,med,max,p(90),p(95),p(99)"
+node -e "console.log(require('path').join(require('os').tmpdir(),'k6-results.json'))"
 ```
+Sau đó chạy k6 với đường dẫn đầu ra tương ứng:
+```bash
+k6 run $test_file --out json=<TEMP_PATH>/k6-results.json --summary-trend-stats="avg,min,med,max,p(90),p(95),p(99)"
+```
+
+Ví dụ:
+- **Windows:** `k6 run script.k6.js --out json=%TEMP%\k6-results.json`
+- **macOS/Linux:** `k6 run script.k6.js --out json=/tmp/k6-results.json`
 
 Execute and capture output.
 

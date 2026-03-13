@@ -1,12 +1,13 @@
 ---
 name: docker-test
-description: Manage Docker-based test environments. Start/stop test containers (databases, services), run tests in isolated Docker environments. Use for microservices and integration testing with real dependencies.
+version: 2.0.0
+description: Quản lý môi trường kiểm thử Docker. Khởi động/dừng container (cơ sở dữ liệu, dịch vụ), chạy kiểm thử trong môi trường Docker cô lập. Dùng cho microservices và kiểm thử tích hợp.
 allowed-tools: Bash(docker *), Bash(docker-compose *), Bash(cat *), Bash(ls *), Bash(node *), Bash(curl *), Read, Grep, Glob
 user-invocable: true
 argument-hint: <up|down|status|run> [--file docker-compose.test.yml] [--service name] [--build]
 ---
 
-# Docker Test Environment
+# Môi trường kiểm thử Docker
 
 Manage Docker containers for isolated test environments.
 
@@ -48,14 +49,20 @@ Specific service:
 docker compose -f $compose_file up -d $service_name
 ```
 
-**Wait for services to be healthy:**
-```bash
-# Wait for database
-timeout $timeout bash -c 'until docker compose -f $compose_file exec db pg_isready; do sleep 1; done'
+**Đợi dịch vụ sẵn sàng (tương thích đa nền tảng):**
 
-# Wait for HTTP service
+**Trên macOS/Linux:**
+```bash
+timeout $timeout bash -c 'until docker compose -f $compose_file exec db pg_isready; do sleep 1; done'
 timeout $timeout bash -c 'until curl -sf http://localhost:3000/health; do sleep 1; done'
 ```
+
+**Trên Windows (dùng Node.js):**
+```bash
+node -e "const {execSync}=require('child_process');const start=Date.now();const timeout=$timeout*1000;while(Date.now()-start<timeout){try{execSync('docker compose -f $compose_file exec db pg_isready',{timeout:5000});process.exit(0)}catch{}}console.error('Hết thời gian đợi');process.exit(1)"
+```
+
+> **Lưu ý:** Lệnh `timeout` trên Windows CMD có cú pháp khác (`timeout /t` chỉ để tạm dừng). Dùng Node.js hoặc Git Bash cho logic đợi phức tạp.
 
 ### 2. Action: `down` — Stop Test Environment
 
@@ -124,6 +131,21 @@ Status: All services healthy | Uptime: 2m 30s
 - If build fails: show build logs and suggest `--no-cache` rebuild
 - If service unhealthy: show last 20 lines of logs for that service
 - If out of disk space: suggest `docker system prune` to clean up
+
+## Security Best Practices
+
+> **⚠ CRITICAL: Never hardcode passwords or secrets in docker-compose files.**
+
+- **Use environment variables with defaults** for all credentials in `docker-compose.test.yml`:
+  - `${POSTGRES_PASSWORD:-testpass}` — defaults are only for local development convenience
+  - Create a `.env` file (from `templates/.env.example`) for environment-specific overrides
+- **Never commit `.env` files** — they are gitignored by default. Only `.env.example` templates should be in version control.
+- **Use separate credentials** for test vs. production environments — never reuse production database passwords in test configs.
+- **For CI/CD pipelines**: inject credentials via pipeline secrets (GitHub Secrets, GitLab CI Variables), not via committed `.env` files.
+- **Rotate database passwords** regularly, especially for shared test environments.
+- **Limit port exposure** — only expose ports that tests actually need. Avoid exposing database ports in production-like environments.
+- **Clean up volumes** containing test data after use: `docker compose down -v` removes data volumes to prevent credential/data leakage.
+- **Scan Docker images** for vulnerabilities: `docker scout cve <image>` or use Trivy/Snyk.
 
 ## Related Skills
 

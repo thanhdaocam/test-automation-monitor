@@ -148,9 +148,9 @@ test.describe('Login', () => {
     await page.goto('/login');
 
     // Nhập thông tin
-    await page.fill('input[name="email"]', 'admin@example.com');
-    await page.fill('input[name="password"]', 'Admin@123');
-    await page.click('button[type="submit"]');
+    await page.locator('input[name="email"]').fill('admin@example.com');
+    await page.locator('input[name="password"]').fill('Admin@123');
+    await page.locator('button[type="submit"]').click();
 
     // Kiểm tra chuyển trang sau login
     await expect(page).toHaveURL('/dashboard');
@@ -160,9 +160,9 @@ test.describe('Login', () => {
   test('đăng nhập thất bại - sai mật khẩu', async ({ page }) => {
     await page.goto('/login');
 
-    await page.fill('input[name="email"]', 'admin@example.com');
-    await page.fill('input[name="password"]', 'sai_mat_khau');
-    await page.click('button[type="submit"]');
+    await page.locator('input[name="email"]').fill('admin@example.com');
+    await page.locator('input[name="password"]').fill('sai_mat_khau');
+    await page.locator('button[type="submit"]').click();
 
     // Kiểm tra thông báo lỗi
     await expect(page.locator('.error-message')).toBeVisible();
@@ -175,8 +175,8 @@ test.describe('Login', () => {
   test('đăng nhập thất bại - để trống email', async ({ page }) => {
     await page.goto('/login');
 
-    await page.fill('input[name="password"]', 'password123');
-    await page.click('button[type="submit"]');
+    await page.locator('input[name="password"]').fill('password123');
+    await page.locator('button[type="submit"]').click();
 
     // Browser validation hoặc custom validation
     await expect(page.locator('input[name="email"]:invalid')).toBeVisible();
@@ -185,10 +185,10 @@ test.describe('Login', () => {
   test('chức năng "Remember me"', async ({ page }) => {
     await page.goto('/login');
 
-    await page.fill('input[name="email"]', 'admin@example.com');
-    await page.fill('input[name="password"]', 'Admin@123');
-    await page.check('input[name="remember"]');
-    await page.click('button[type="submit"]');
+    await page.locator('input[name="email"]').fill('admin@example.com');
+    await page.locator('input[name="password"]').fill('Admin@123');
+    await page.locator('input[name="remember"]').check();
+    await page.locator('button[type="submit"]').click();
 
     await expect(page).toHaveURL('/dashboard');
 
@@ -201,13 +201,13 @@ test.describe('Login', () => {
   test('chức năng Logout', async ({ page }) => {
     // Login trước
     await page.goto('/login');
-    await page.fill('input[name="email"]', 'admin@example.com');
-    await page.fill('input[name="password"]', 'Admin@123');
-    await page.click('button[type="submit"]');
+    await page.locator('input[name="email"]').fill('admin@example.com');
+    await page.locator('input[name="password"]').fill('Admin@123');
+    await page.locator('button[type="submit"]').click();
     await expect(page).toHaveURL('/dashboard');
 
     // Logout
-    await page.click('#logout-button');
+    await page.locator('#logout-button').click();
 
     // Redirect về login
     await expect(page).toHaveURL('/login');
@@ -222,11 +222,11 @@ test.describe('Register', () => {
   test('đăng ký tài khoản mới', async ({ page }) => {
     await page.goto('/register');
 
-    await page.fill('input[name="fullname"]', 'Nguyen Van A');
-    await page.fill('input[name="email"]', `test_${Date.now()}@example.com`);
-    await page.fill('input[name="password"]', 'StrongPass@123');
-    await page.fill('input[name="confirm_password"]', 'StrongPass@123');
-    await page.click('button[type="submit"]');
+    await page.locator('input[name="fullname"]').fill('Nguyen Van A');
+    await page.locator('input[name="email"]').fill(`test_${Date.now()}@example.com`);
+    await page.locator('input[name="password"]').fill('StrongPass@123');
+    await page.locator('input[name="confirm_password"]').fill('StrongPass@123');
+    await page.locator('button[type="submit"]').click();
 
     // Kiểm tra đăng ký thành công
     await expect(page.locator('.success-message')).toBeVisible();
@@ -235,10 +235,10 @@ test.describe('Register', () => {
   test('đăng ký thất bại - email đã tồn tại', async ({ page }) => {
     await page.goto('/register');
 
-    await page.fill('input[name="email"]', 'admin@example.com'); // email đã có
-    await page.fill('input[name="password"]', 'StrongPass@123');
-    await page.fill('input[name="confirm_password"]', 'StrongPass@123');
-    await page.click('button[type="submit"]');
+    await page.locator('input[name="email"]').fill('admin@example.com'); // email đã có
+    await page.locator('input[name="password"]').fill('StrongPass@123');
+    await page.locator('input[name="confirm_password"]').fill('StrongPass@123');
+    await page.locator('button[type="submit"]').click();
 
     await expect(page.locator('.error-message')).toContainText('Email đã tồn tại');
   });
@@ -246,9 +246,9 @@ test.describe('Register', () => {
   test('đăng ký thất bại - password không khớp', async ({ page }) => {
     await page.goto('/register');
 
-    await page.fill('input[name="password"]', 'Password@123');
-    await page.fill('input[name="confirm_password"]', 'KhacNhau@456');
-    await page.click('button[type="submit"]');
+    await page.locator('input[name="password"]').fill('Password@123');
+    await page.locator('input[name="confirm_password"]').fill('KhacNhau@456');
+    await page.locator('button[type="submit"]').click();
 
     await expect(page.locator('.error-message')).toContainText('Mật khẩu không khớp');
   });
@@ -310,82 +310,82 @@ test.describe('Form Validation - Tạo sản phẩm', () => {
   test.beforeEach(async ({ page }) => {
     // Login trước (giả sử cần auth)
     await page.goto('/login');
-    await page.fill('input[name="email"]', 'admin@example.com');
-    await page.fill('input[name="password"]', 'Admin@123');
-    await page.click('button[type="submit"]');
+    await page.locator('input[name="email"]').fill('admin@example.com');
+    await page.locator('input[name="password"]').fill('Admin@123');
+    await page.locator('button[type="submit"]').click();
     await page.goto('/products/new');
   });
 
   test('submit form với đầy đủ dữ liệu hợp lệ', async ({ page }) => {
-    await page.fill('input[name="name"]', 'Sản phẩm test ABC');
-    await page.fill('input[name="price"]', '150000');
-    await page.fill('textarea[name="description"]', 'Mô tả sản phẩm chi tiết');
-    await page.selectOption('select[name="category"]', 'electronics');
-    await page.check('input[name="in_stock"]');
-    await page.click('button[type="submit"]');
+    await page.locator('input[name="name"]').fill('Sản phẩm test ABC');
+    await page.locator('input[name="price"]').fill('150000');
+    await page.locator('textarea[name="description"]').fill('Mô tả sản phẩm chi tiết');
+    await page.locator('select[name="category"]').selectOption('electronics');
+    await page.locator('input[name="in_stock"]').check();
+    await page.locator('button[type="submit"]').click();
 
     await expect(page.locator('.toast-success')).toContainText('Tạo sản phẩm thành công');
   });
 
   test('validation - tên sản phẩm trống', async ({ page }) => {
     // Bỏ trống tên
-    await page.fill('input[name="price"]', '150000');
-    await page.click('button[type="submit"]');
+    await page.locator('input[name="price"]').fill('150000');
+    await page.locator('button[type="submit"]').click();
 
     await expect(page.locator('.field-error[data-field="name"]')).toContainText('Tên là bắt buộc');
   });
 
   test('validation - giá phải là số dương', async ({ page }) => {
-    await page.fill('input[name="name"]', 'Test');
-    await page.fill('input[name="price"]', '-5000');
-    await page.click('button[type="submit"]');
+    await page.locator('input[name="name"]').fill('Test');
+    await page.locator('input[name="price"]').fill('-5000');
+    await page.locator('button[type="submit"]').click();
 
     await expect(page.locator('.field-error[data-field="price"]')).toContainText('Giá phải lớn hơn 0');
   });
 
   test('validation - giá nhập chữ', async ({ page }) => {
-    await page.fill('input[name="name"]', 'Test');
-    await page.fill('input[name="price"]', 'abc');
-    await page.click('button[type="submit"]');
+    await page.locator('input[name="name"]').fill('Test');
+    await page.locator('input[name="price"]').fill('abc');
+    await page.locator('button[type="submit"]').click();
 
     await expect(page.locator('.field-error[data-field="price"]')).toBeVisible();
   });
 
   test('validation - mô tả quá dài (>1000 ký tự)', async ({ page }) => {
-    await page.fill('input[name="name"]', 'Test');
-    await page.fill('input[name="price"]', '100000');
-    await page.fill('textarea[name="description"]', 'A'.repeat(1001));
-    await page.click('button[type="submit"]');
+    await page.locator('input[name="name"]').fill('Test');
+    await page.locator('input[name="price"]').fill('100000');
+    await page.locator('textarea[name="description"]').fill('A'.repeat(1001));
+    await page.locator('button[type="submit"]').click();
 
     await expect(page.locator('.field-error[data-field="description"]')).toContainText('tối đa 1000');
   });
 
   test('validation - email format sai', async ({ page }) => {
-    await page.fill('input[name="contact_email"]', 'khong-phai-email');
-    await page.click('button[type="submit"]');
+    await page.locator('input[name="contact_email"]').fill('khong-phai-email');
+    await page.locator('button[type="submit"]').click();
 
     await expect(page.locator('.field-error[data-field="contact_email"]')).toContainText('Email không hợp lệ');
   });
 
   test('validation - số điện thoại format sai', async ({ page }) => {
-    await page.fill('input[name="phone"]', '123');  // quá ngắn
-    await page.click('button[type="submit"]');
+    await page.locator('input[name="phone"]').fill('123');  // quá ngắn
+    await page.locator('button[type="submit"]').click();
 
     await expect(page.locator('.field-error[data-field="phone"]')).toContainText('Số điện thoại không hợp lệ');
   });
 
   test('validation hiển thị nhiều lỗi cùng lúc', async ({ page }) => {
     // Submit form hoàn toàn trống
-    await page.click('button[type="submit"]');
+    await page.locator('button[type="submit"]').click();
 
     const errors = page.locator('.field-error');
     await expect(errors).toHaveCount(3);  // ít nhất 3 field bắt buộc
   });
 
   test('validation - XSS injection', async ({ page }) => {
-    await page.fill('input[name="name"]', '<script>alert("xss")</script>');
-    await page.fill('input[name="price"]', '100000');
-    await page.click('button[type="submit"]');
+    await page.locator('input[name="name"]').fill('<script>alert("xss")</script>');
+    await page.locator('input[name="price"]').fill('100000');
+    await page.locator('button[type="submit"]').click();
 
     // Nếu app xử lý đúng: escape HTML hoặc reject input
     const pageContent = await page.content();
@@ -393,9 +393,9 @@ test.describe('Form Validation - Tạo sản phẩm', () => {
   });
 
   test('validation - SQL injection', async ({ page }) => {
-    await page.fill('input[name="name"]', "'; DROP TABLE products; --");
-    await page.fill('input[name="price"]', '100000');
-    await page.click('button[type="submit"]');
+    await page.locator('input[name="name"]').fill("'; DROP TABLE products; --");
+    await page.locator('input[name="price"]').fill('100000');
+    await page.locator('button[type="submit"]').click();
 
     // App phải xử lý đúng, không crash
     await expect(page.locator('body')).not.toContainText('SQL');
@@ -437,11 +437,11 @@ test.describe('Navigation & Routing', () => {
   test('click menu chuyển đúng trang', async ({ page }) => {
     await page.goto('/');
 
-    await page.click('nav a[href="/products"]');
+    await page.locator('nav a[href="/products"]').click();
     await expect(page).toHaveURL('/products');
     await expect(page.locator('h1')).toContainText('Sản phẩm');
 
-    await page.click('nav a[href="/about"]');
+    await page.locator('nav a[href="/about"]').click();
     await expect(page).toHaveURL('/about');
     await expect(page.locator('h1')).toContainText('Giới thiệu');
   });
@@ -458,7 +458,7 @@ test.describe('Navigation & Routing', () => {
 
   test('nút Back hoạt động đúng', async ({ page }) => {
     await page.goto('/');
-    await page.click('nav a[href="/products"]');
+    await page.locator('nav a[href="/products"]').click();
     await expect(page).toHaveURL('/products');
 
     await page.goBack();
@@ -492,12 +492,12 @@ test.describe('Navigation & Routing', () => {
     await page.goto('/products');
 
     // Click trang 2
-    await page.click('.pagination a[data-page="2"]');
+    await page.locator('.pagination a[data-page="2"]').click();
     await expect(page).toHaveURL(/page=2/);
 
     // Nội dung phải thay đổi
     const firstItem = await page.locator('.product-item:first-child').textContent();
-    await page.click('.pagination a[data-page="1"]');
+    await page.locator('.pagination a[data-page="1"]').click();
     const firstItemPage1 = await page.locator('.product-item:first-child').textContent();
     expect(firstItem).not.toBe(firstItemPage1);
   });
@@ -527,11 +527,11 @@ test.describe('Search & Filter', () => {
   });
 
   test('tìm kiếm theo từ khóa', async ({ page }) => {
-    await page.fill('input[name="search"]', 'laptop');
-    await page.click('button.search-btn');
+    await page.locator('input[name="search"]').fill('laptop');
+    await page.locator('button.search-btn').click();
 
     // Chờ kết quả load
-    await page.waitForSelector('.product-list');
+    await page.locator('.product-list').waitFor();
 
     // Tất cả kết quả phải chứa "laptop"
     const items = page.locator('.product-item');
@@ -545,16 +545,16 @@ test.describe('Search & Filter', () => {
   });
 
   test('tìm kiếm không có kết quả', async ({ page }) => {
-    await page.fill('input[name="search"]', 'xyzkhongtontai12345');
-    await page.click('button.search-btn');
+    await page.locator('input[name="search"]').fill('xyzkhongtontai12345');
+    await page.locator('button.search-btn').click();
 
     await expect(page.locator('.no-results')).toBeVisible();
     await expect(page.locator('.no-results')).toContainText('Không tìm thấy');
   });
 
   test('filter theo danh mục', async ({ page }) => {
-    await page.selectOption('select[name="category"]', 'electronics');
-    await page.waitForSelector('.product-list');
+    await page.locator('select[name="category"]').selectOption('electronics');
+    await page.locator('.product-list').waitFor();
 
     const items = page.locator('.product-item .category-badge');
     const count = await items.count();
@@ -564,11 +564,11 @@ test.describe('Search & Filter', () => {
   });
 
   test('filter theo khoảng giá', async ({ page }) => {
-    await page.fill('input[name="price_min"]', '100000');
-    await page.fill('input[name="price_max"]', '500000');
-    await page.click('button.apply-filter');
+    await page.locator('input[name="price_min"]').fill('100000');
+    await page.locator('input[name="price_max"]').fill('500000');
+    await page.locator('button.apply-filter').click();
 
-    await page.waitForSelector('.product-list');
+    await page.locator('.product-list').waitFor();
 
     const prices = page.locator('.product-item .price');
     const count = await prices.count();
@@ -581,8 +581,8 @@ test.describe('Search & Filter', () => {
   });
 
   test('sort theo giá tăng dần', async ({ page }) => {
-    await page.selectOption('select[name="sort"]', 'price_asc');
-    await page.waitForSelector('.product-list');
+    await page.locator('select[name="sort"]').selectOption('price_asc');
+    await page.locator('.product-list').waitFor();
 
     const prices = page.locator('.product-item .price');
     const count = await prices.count();
@@ -600,25 +600,25 @@ test.describe('Search & Filter', () => {
   });
 
   test('kết hợp search + filter + sort', async ({ page }) => {
-    await page.fill('input[name="search"]', 'phone');
-    await page.selectOption('select[name="category"]', 'electronics');
-    await page.selectOption('select[name="sort"]', 'price_desc');
-    await page.click('button.apply-filter');
+    await page.locator('input[name="search"]').fill('phone');
+    await page.locator('select[name="category"]').selectOption('electronics');
+    await page.locator('select[name="sort"]').selectOption('price_desc');
+    await page.locator('button.apply-filter').click();
 
-    await page.waitForSelector('.product-list');
+    await page.locator('.product-list').waitFor();
     const count = await page.locator('.product-item').count();
     expect(count).toBeGreaterThan(0);
   });
 
   test('clear filter reset về trạng thái ban đầu', async ({ page }) => {
     // Apply filters
-    await page.fill('input[name="search"]', 'test');
-    await page.selectOption('select[name="category"]', 'electronics');
-    await page.click('button.apply-filter');
+    await page.locator('input[name="search"]').fill('test');
+    await page.locator('select[name="category"]').selectOption('electronics');
+    await page.locator('button.apply-filter').click();
 
     // Clear
-    await page.click('button.clear-filter');
-    await page.waitForSelector('.product-list');
+    await page.locator('button.clear-filter').click();
+    await page.locator('.product-list').waitFor();
 
     // Verify reset
     await expect(page.locator('input[name="search"]')).toHaveValue('');
@@ -627,7 +627,7 @@ test.describe('Search & Filter', () => {
 
   test('search realtime (debounce)', async ({ page }) => {
     // Giả sử search có auto-suggest
-    await page.fill('input[name="search"]', 'lap');
+    await page.locator('input[name="search"]').fill('lap');
     await page.waitForTimeout(500); // debounce
 
     const suggestions = page.locator('.search-suggestions li');
@@ -662,19 +662,19 @@ test.describe('CRUD - Quản lý sản phẩm', () => {
   test.beforeEach(async ({ page }) => {
     // Login as admin
     await page.goto('/login');
-    await page.fill('input[name="email"]', 'admin@example.com');
-    await page.fill('input[name="password"]', 'Admin@123');
-    await page.click('button[type="submit"]');
+    await page.locator('input[name="email"]').fill('admin@example.com');
+    await page.locator('input[name="password"]').fill('Admin@123');
+    await page.locator('button[type="submit"]').click();
   });
 
   test('CREATE - tạo sản phẩm mới', async ({ page }) => {
     await page.goto('/products/new');
 
-    await page.fill('input[name="name"]', uniqueName);
-    await page.fill('input[name="price"]', '299000');
-    await page.fill('textarea[name="description"]', 'Mô tả sản phẩm test');
-    await page.selectOption('select[name="category"]', 'electronics');
-    await page.click('button[type="submit"]');
+    await page.locator('input[name="name"]').fill(uniqueName);
+    await page.locator('input[name="price"]').fill('299000');
+    await page.locator('textarea[name="description"]').fill('Mô tả sản phẩm test');
+    await page.locator('select[name="category"]').selectOption('electronics');
+    await page.locator('button[type="submit"]').click();
 
     // Verify tạo thành công
     await expect(page.locator('.toast-success')).toBeVisible();
@@ -686,9 +686,9 @@ test.describe('CRUD - Quản lý sản phẩm', () => {
     await page.goto('/products');
 
     // Tìm sản phẩm vừa tạo
-    await page.fill('input[name="search"]', uniqueName);
-    await page.click('button.search-btn');
-    await page.click(`.product-item:has-text("${uniqueName}") a`);
+    await page.locator('input[name="search"]').fill(uniqueName);
+    await page.locator('button.search-btn').click();
+    await page.locator(`.product-item:has-text("${uniqueName}") a`).click();
 
     // Verify thông tin hiển thị đúng
     await expect(page.locator('.product-name')).toContainText(uniqueName);
@@ -699,14 +699,14 @@ test.describe('CRUD - Quản lý sản phẩm', () => {
   test('UPDATE - sửa sản phẩm', async ({ page }) => {
     await page.goto('/products');
 
-    await page.fill('input[name="search"]', uniqueName);
-    await page.click('button.search-btn');
-    await page.click(`.product-item:has-text("${uniqueName}") .edit-btn`);
+    await page.locator('input[name="search"]').fill(uniqueName);
+    await page.locator('button.search-btn').click();
+    await page.locator(`.product-item:has-text("${uniqueName}") .edit-btn`).click();
 
     // Sửa thông tin
-    await page.fill('input[name="price"]', '399000');
-    await page.fill('textarea[name="description"]', 'Mô tả đã cập nhật');
-    await page.click('button[type="submit"]');
+    await page.locator('input[name="price"]').fill('399000');
+    await page.locator('textarea[name="description"]').fill('Mô tả đã cập nhật');
+    await page.locator('button[type="submit"]').click();
 
     await expect(page.locator('.toast-success')).toContainText('Cập nhật thành công');
 
@@ -717,28 +717,28 @@ test.describe('CRUD - Quản lý sản phẩm', () => {
   test('DELETE - xóa sản phẩm', async ({ page }) => {
     await page.goto('/products');
 
-    await page.fill('input[name="search"]', uniqueName);
-    await page.click('button.search-btn');
-    await page.click(`.product-item:has-text("${uniqueName}") .delete-btn`);
+    await page.locator('input[name="search"]').fill(uniqueName);
+    await page.locator('button.search-btn').click();
+    await page.locator(`.product-item:has-text("${uniqueName}") .delete-btn`).click();
 
     // Confirm dialog
-    await page.click('.confirm-dialog .confirm-btn');
+    await page.locator('.confirm-dialog .confirm-btn').click();
 
     await expect(page.locator('.toast-success')).toContainText('Xóa thành công');
 
     // Verify đã xóa - tìm lại không thấy
-    await page.fill('input[name="search"]', uniqueName);
-    await page.click('button.search-btn');
+    await page.locator('input[name="search"]').fill(uniqueName);
+    await page.locator('button.search-btn').click();
     await expect(page.locator('.no-results')).toBeVisible();
   });
 
   test('DELETE - hủy xóa', async ({ page }) => {
     await page.goto('/products');
 
-    await page.click('.product-item:first-child .delete-btn');
+    await page.locator('.product-item:first-child .delete-btn').click();
 
     // Click Cancel
-    await page.click('.confirm-dialog .cancel-btn');
+    await page.locator('.confirm-dialog .cancel-btn').click();
 
     // Sản phẩm vẫn còn
     const countBefore = await page.locator('.product-item').count();
@@ -779,7 +779,7 @@ test.describe('Upload File', () => {
     await expect(page.locator('.preview-image')).toBeVisible();
 
     // Submit upload
-    await page.click('button.upload-btn');
+    await page.locator('button.upload-btn').click();
 
     await expect(page.locator('.upload-success')).toBeVisible();
     await expect(page.locator('.uploaded-file-name')).toContainText('test-image.jpg');
@@ -815,7 +815,7 @@ test.describe('Upload File', () => {
       path.join(__dirname, 'fixtures', 'image2.png'),
     ]);
 
-    await page.click('button.upload-btn');
+    await page.locator('button.upload-btn').click();
 
     const uploadedFiles = page.locator('.uploaded-file-name');
     await expect(uploadedFiles).toHaveCount(2);
@@ -869,7 +869,7 @@ test.describe('Responsive - Mobile', () => {
     await expect(page.locator('button.hamburger')).toBeVisible();
 
     // Click hamburger → menu mở
-    await page.click('button.hamburger');
+    await page.locator('button.hamburger').click();
     await expect(page.locator('nav.mobile-menu')).toBeVisible();
   });
 
@@ -2760,9 +2760,9 @@ test.describe('Production Smoke Tests @smoke', () => {
 
   test('login flow works', async ({ page }) => {
     await page.goto('/login');
-    await page.fill('[name=email]', 'smoke-test@example.com');
-    await page.fill('[name=password]', 'SmokeTest123!');
-    await page.click('[type=submit]');
+    await page.locator('[name=email]').fill('smoke-test@example.com');
+    await page.locator('[name=password]').fill('SmokeTest123!');
+    await page.locator('[type=submit]').click();
     await expect(page).toHaveURL(/dashboard/);
   });
 });

@@ -1,18 +1,19 @@
 ---
 name: test-report
-description: View test results and statistics from the last test run or a specific report file. Shows pass/fail counts, duration, failure details, and trend data. Use after running tests to analyze results.
-allowed-tools: Bash(ls *), Bash(cat *), Bash(find *), Bash(wc *), Read, Grep, Glob
+version: 1.0.0
+description: Xem kết quả kiểm thử và thống kê từ lần chạy gần nhất hoặc tệp báo cáo cụ thể. Hiển thị số đạt/lỗi, thời gian, chi tiết lỗi và dữ liệu xu hướng. Dùng sau khi chạy kiểm thử để phân tích kết quả.
+allowed-tools: Bash(ls *), Bash(cat *), Bash(node *), Bash(wc *), Read, Grep, Glob
 user-invocable: true
 argument-hint: [--last] [--file path] [--failures-only] [--suite name]
 ---
 
-# View Test Report
+# Xem báo cáo kiểm thử
 
 Parse and display test results from Playwright, WebdriverIO, or k6 runs.
 
-## Available Result Files
+## Tệp kết quả hiện có
 
-!`ls -lt test-results/ playwright-report/ reports/ 2>/dev/null | head -10 || echo "No test result directories found"`
+!`node -e "const fs=require('fs');const path=require('path');const dirs=['test-results','playwright-report','reports'];for(const d of dirs){try{const files=fs.readdirSync(d).map(f=>({name:f,time:fs.statSync(path.join(d,f)).mtime})).sort((a,b)=>b.time-a.time).slice(0,10);if(files.length)files.forEach(f=>console.log(d+'/'+f.name+' '+f.time.toLocaleString()))}catch{}}if(!dirs.some(d=>{try{return fs.readdirSync(d).length>0}catch{return false}}))console.log('Không tìm thấy thư mục kết quả kiểm thử')"`
 
 ## Parse Arguments
 
@@ -36,10 +37,9 @@ ls -la reports/ 2>/dev/null
 ls -la allure-results/ 2>/dev/null
 ```
 
-Also look for:
+Also look for (tương thích đa nền tảng — dùng Node.js thay `find`):
 ```bash
-find . -maxdepth 3 -name "*.json" -path "*/test-results/*" -o -name "results.json" -o -name "report.json" 2>/dev/null | head -10
-find . -maxdepth 3 -name "junit*.xml" -o -name "test-results*.xml" 2>/dev/null | head -10
+node -e "const fs=require('fs');const path=require('path');function walk(dir,depth){if(depth>3)return[];let results=[];try{for(const f of fs.readdirSync(dir)){const fp=path.join(dir,f);const stat=fs.statSync(fp);if(stat.isDirectory()&&!f.startsWith('.'))results=results.concat(walk(fp,depth+1));else if(/results\.json$|report\.json$|junit.*\.xml$|test-results.*\.xml$/.test(f))results.push(fp)}}catch{}return results}const files=walk('.',0).slice(0,10);console.log(files.length?files.join('\\n'):'Không tìm thấy tệp kết quả')"
 ```
 
 If `--file` specified, use that directly. If `--last`, use the most recently modified file.
@@ -136,6 +136,18 @@ After showing results:
 - If failures: "Run `/run-test <file> --debug` to debug the failing test"
 - If performance issues: "Consider optimizing endpoints with p(95) > 500ms"
 - If no results found: "No test results found. Run `/run-test` or `/mobile-test` first."
+
+## Lưu ý tương thích đa nền tảng
+
+- Các lệnh `ls -la ... 2>/dev/null` hoạt động trong Git Bash trên Windows. Trên PowerShell thuần, dùng `Get-ChildItem ... -ErrorAction SilentlyContinue` thay thế.
+- Các script parse kết quả có sẵn cả phiên bản `.sh` (bash) và `.ps1` (PowerShell):
+  - `scripts/parse-playwright-results.sh` / `scripts/parse-playwright-results.ps1`
+  - `scripts/parse-k6-results.sh` / `scripts/parse-k6-results.ps1`
+  - `scripts/parse-wdio-results.sh` / `scripts/parse-wdio-results.ps1`
+  - `scripts/parse-cypress-results.sh` / `scripts/parse-cypress-results.ps1`
+  - `scripts/parse-jest-results.sh` / `scripts/parse-jest-results.ps1`
+  - `scripts/parse-api-results.sh` / `scripts/parse-api-results.ps1`
+- Trên Windows PowerShell: `powershell -ExecutionPolicy Bypass -File scripts/parse-<type>-results.ps1 <results.json>`
 
 ## Error Recovery
 

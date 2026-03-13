@@ -1,24 +1,25 @@
 ---
 name: rn-test
-description: Run React Native tests. Supports Jest for unit tests and Detox for E2E tests on real devices and emulators. Use for React Native mobile projects.
+version: 2.0.0
+description: Chạy kiểm thử React Native. Hỗ trợ Jest cho kiểm thử đơn vị và Detox cho kiểm thử E2E trên thiết bị thật và trình giả lập. Dùng cho dự án di động React Native.
 allowed-tools: Bash(npx *), Bash(node *), Bash(detox *), Bash(adb *), Bash(cat *), Bash(ls *), Read, Grep, Glob
 user-invocable: true
 argument-hint: [test-file] [--e2e] [--device device-name] [--platform android|ios] [--configuration debug|release]
 ---
 
-# React Native Testing
+# Kiểm thử React Native
 
-Execute React Native unit tests (Jest) and E2E tests (Detox).
+Thực thi kiểm thử đơn vị React Native (Jest) và kiểm thử E2E (Detox).
 
-## Current Project Context
+## Ngữ cảnh dự án hiện tại
 
-React Native detection:
-!`node -e "try{const p=require('./package.json');const d={...p.dependencies,...p.devDependencies};if(d['react-native'])console.log('React Native: '+d['react-native']);else console.log('Not a React Native project')}catch{console.log('No package.json')}" 2>/dev/null`
+Phát hiện React Native:
+!`node -e "try{const p=require('./package.json');const d={...p.dependencies,...p.devDependencies};if(d['react-native'])console.log('React Native: '+d['react-native']);else console.log('Không phải dự án React Native')}catch{console.log('Không có package.json')}" 2>/dev/null`
 
-Test framework detection:
-!`node -e "try{const p=require('./package.json');const d={...p.dependencies,...p.devDependencies};const fw=[];if(d.detox)fw.push('detox@'+d.detox);if(d.jest||d['@jest/core'])fw.push('jest');if(d['@testing-library/react-native'])fw.push('testing-library/react-native');console.log(fw.length?fw.join(', '):'No test frameworks found')}catch{}" 2>/dev/null`
+Phát hiện framework kiểm thử:
+!`node -e "try{const p=require('./package.json');const d={...p.dependencies,...p.devDependencies};const fw=[];if(d.detox)fw.push('detox@'+d.detox);if(d.jest||d['@jest/core'])fw.push('jest');if(d['@testing-library/react-native'])fw.push('testing-library/react-native');console.log(fw.length?fw.join(', '):'Không tìm thấy framework kiểm thử')}catch{}" 2>/dev/null`
 
-Detox config:
+Cấu hình Detox:
 !`ls .detoxrc.js .detoxrc.json detox.config.js detox.config.json package.json 2>/dev/null | head -3`
 
 ## Parse Arguments
@@ -121,7 +122,7 @@ Artifacts: artifacts/
 - If not a React Native project: suggest using `/unit-test` or `/run-test` instead
 - If Detox not installed: "Run `npm install -D detox` and configure `.detoxrc.js`"
 - If build fails: check metro bundler, clean build with `cd android && ./gradlew clean`
-- If no device/emulator found: suggest starting emulator or `flutter devices`
+- Nếu không tìm thấy thiết bị/trình giả lập: gợi ý khởi động trình giả lập hoặc chạy `/devices` để kiểm tra
 - If app crash during test: check device logs with `adb logcat`
 - For iOS (macOS only): check Xcode installation and simulator setup
 

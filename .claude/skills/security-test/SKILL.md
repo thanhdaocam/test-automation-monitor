@@ -1,14 +1,15 @@
 ---
 name: security-test
-description: Run security scans on your project. Checks for dependency vulnerabilities (npm audit, Snyk), OWASP issues, and common security misconfigurations. Use for any project that needs security compliance.
+version: 2.0.0
+description: Quét bảo mật dự án. Kiểm tra lỗ hổng phụ thuộc (npm audit, Snyk), vấn đề OWASP, và cấu hình bảo mật sai phổ biến. Dùng cho mọi dự án cần tuân thủ bảo mật.
 allowed-tools: Bash(npm *), Bash(npx *), Bash(node *), Bash(pip *), Bash(cat *), Bash(ls *), Bash(grep *), Read, Grep, Glob
 user-invocable: true
 argument-hint: [--deps] [--code] [--owasp] [--fix] [--severity critical|high|medium|low]
 ---
 
-# Security Testing
+# Kiểm thử bảo mật
 
-Scan your project for security vulnerabilities: dependency audit, code analysis, and OWASP checks.
+Quét dự án để tìm lỗ hổng bảo mật: kiểm tra phụ thuộc, phân tích mã tĩnh và kiểm tra OWASP.
 
 ## Current Project Context
 
@@ -55,23 +56,33 @@ npx snyk test --json 2>/dev/null
 
 ### 2. Static Code Analysis
 
-**Check for hardcoded secrets:**
+**Kiểm tra secrets được mã hóa cứng (tương thích đa nền tảng — dùng Grep tool hoặc Node.js):**
+
+> **Lưu ý:** Các lệnh `grep -rn --include` bên dưới hoạt động trên macOS/Linux/Git Bash. Trên Windows thuần, sử dụng công cụ Grep tích hợp của Claude Code hoặc `findstr /s /n /r` thay thế.
+
 ```bash
-# Search for potential secrets in code
-grep -rn --include="*.{ts,js,tsx,jsx,py,java,go}" -E "(password|secret|api_key|token|private_key)\s*[:=]\s*['\"][^'\"]+['\"]" src/ app/ lib/ 2>/dev/null | head -20
+# Tìm kiếm secrets tiềm ẩn trong mã nguồn (macOS/Linux/Git Bash)
+grep -rn --include="*.ts" --include="*.js" --include="*.tsx" --include="*.jsx" --include="*.py" --include="*.java" --include="*.go" -E "(password|secret|api_key|token|private_key)\s*[:=]\s*['\"][^'\"]+['\"]" src/ app/ lib/ 2>/dev/null | head -20
 ```
 
-**Check for common security anti-patterns:**
+**Thay thế Windows (PowerShell):**
+```powershell
+Get-ChildItem -Recurse -Include *.ts,*.js,*.tsx,*.jsx,*.py -Path src/,app/,lib/ -ErrorAction SilentlyContinue | Select-String -Pattern "(password|secret|api_key|token|private_key)\s*[:=]\s*['\`"][^'\`"]+['\`"]" | Select-Object -First 20
+```
+
+**Kiểm tra mẫu bảo mật phổ biến:**
 ```bash
-# SQL injection patterns
-grep -rn --include="*.{ts,js,py}" -E "(\bexec\b.*\+|query\(.*\+|raw\(.*\$)" src/ 2>/dev/null | head -10
+# SQL injection patterns (macOS/Linux/Git Bash)
+grep -rn --include="*.ts" --include="*.js" --include="*.py" -E "(\bexec\b.*\+|query\(.*\+|raw\(.*\$)" src/ 2>/dev/null | head -10
 
 # XSS patterns (dangerouslySetInnerHTML, innerHTML)
-grep -rn --include="*.{ts,tsx,js,jsx}" -E "(dangerouslySetInnerHTML|\.innerHTML\s*=)" src/ 2>/dev/null | head -10
+grep -rn --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" -E "(dangerouslySetInnerHTML|\.innerHTML\s*=)" src/ 2>/dev/null | head -10
 
 # Eval usage
-grep -rn --include="*.{ts,js}" -E "\beval\s*\(" src/ 2>/dev/null | head -10
+grep -rn --include="*.ts" --include="*.js" -E "\beval\s*\(" src/ 2>/dev/null | head -10
 ```
+
+> **Gợi ý:** Trên Windows, sử dụng công cụ Grep tích hợp của Claude Code cho các tìm kiếm trên — nó hoạt động trên mọi nền tảng.
 
 ### 3. OWASP Top 10 Check (Web Projects)
 

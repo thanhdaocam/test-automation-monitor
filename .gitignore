@@ -38,3 +38,14 @@ videos/
 
 # Appium logs
 /tmp/appium.log
+
+# Security - Credentials & Secrets
+# Never commit actual notification configs with real webhook URLs/tokens
+notification-config.json
+!templates/notification-config.json
+*.credentials
+*-secret*
+templates/*.local
+
+# Environment example files (safe to commit, but ignore generated ones)
+.env.example

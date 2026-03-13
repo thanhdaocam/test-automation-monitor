@@ -28,7 +28,7 @@ unit-tests:
 
 e2e-tests:
   stage: test
-  image: mcr.microsoft.com/playwright:v1.42.0-jammy
+  image: mcr.microsoft.com/playwright:v1.50.0-jammy
   needs: ["unit-tests"]
   script:
     - npm ci

@@ -1,22 +1,23 @@
 ---
 name: visual-test
-description: Run visual regression tests to detect unintended UI changes. Uses Playwright toHaveScreenshot() or BackstopJS for pixel-by-pixel comparison. Use for UI-critical projects and design systems.
+version: 2.0.0
+description: Chạy kiểm thử hồi quy giao diện để phát hiện thay đổi UI ngoài ý muốn. Dùng Playwright toHaveScreenshot() hoặc BackstopJS so sánh pixel-by-pixel. Dùng cho dự án UI quan trọng và design system.
 allowed-tools: Bash(npx *), Bash(node *), Bash(cat *), Bash(ls *), Bash(mkdir *), Read, Grep, Glob
 user-invocable: true
 argument-hint: [test-file-or-url] [--update] [--threshold 0.1] [--browsers chrome,firefox] [--viewports 1280x720,375x667]
 ---
 
-# Visual Regression Testing
+# Kiểm thử hồi quy giao diện
 
 Compare screenshots of your UI against baseline images to detect visual changes.
 
 ## Current Project Context
 
-Visual test files:
-!`find . -maxdepth 4 -type f \( -name "*.visual.ts" -o -name "*.visual.js" \) 2>/dev/null | head -10 || echo "No visual test files found"`
+Tệp kiểm thử hình ảnh:
+!`node -e "const fs=require('fs');const path=require('path');function walk(d,depth,max){let r=[];if(depth>max)return r;try{for(const f of fs.readdirSync(d)){if(f.startsWith('.'))continue;const p=path.join(d,f);try{const s=fs.statSync(p);if(s.isDirectory()&&f!=='node_modules')r=r.concat(walk(p,depth+1,max));else if(/\.visual\.(ts|js)$/.test(f))r.push(p)}catch{}}}catch{}return r}const files=walk('.',0,4);console.log(files.length?files.join('\n'):'Không tìm thấy tệp kiểm thử hình ảnh')"`
 
-Existing snapshots:
-!`ls -d test-results/*-snapshots/ __screenshots__/ backstop_data/ 2>/dev/null | head -5 || echo "No snapshot directories found"`
+Ảnh chụp hiện có:
+!`node -e "const fs=require('fs');const dirs=['test-results','__screenshots__','backstop_data'];const found=dirs.filter(d=>{try{return fs.statSync(d).isDirectory()}catch{return false}});console.log(found.length?found.join('\\n'):'Không tìm thấy thư mục ảnh chụp')"`
 
 ## Parse Arguments
 

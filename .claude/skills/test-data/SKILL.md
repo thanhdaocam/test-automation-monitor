@@ -1,20 +1,21 @@
 ---
 name: test-data
-description: Generate, seed, and manage test data using Faker.js factories. Create realistic test data for any entity schema. Use before running tests that need consistent test data.
+version: 2.0.0
+description: Tạo, nạp và quản lý dữ liệu kiểm thử bằng Faker.js. Tạo dữ liệu kiểm thử thực tế cho mọi schema entity. Dùng trước khi chạy kiểm thử cần dữ liệu nhất quán.
 allowed-tools: Bash(npx *), Bash(node *), Bash(cat *), Bash(ls *), Read, Write, Grep, Glob
 user-invocable: true
 argument-hint: <generate|seed|cleanup> [--schema name] [--count N] [--output file] [--format json|csv|sql]
 disable-model-invocation: true
 ---
 
-# Test Data Management
+# Quản lý dữ liệu kiểm thử
 
 Generate, seed, and clean up test data for your test suites.
 
 ## Current Project Context
 
-Existing test data files:
-!`find . -maxdepth 4 -type f \( -name "*.fixture.*" -o -name "*.factory.*" -o -name "*.seed.*" -o -name "test-data*" \) 2>/dev/null | head -10 || echo "No test data files found"`
+Tệp dữ liệu kiểm thử hiện có:
+!`node -e "const fs=require('fs');const path=require('path');function walk(d,depth,max){let r=[];if(depth>max)return r;try{for(const f of fs.readdirSync(d)){if(f.startsWith('.'))continue;const p=path.join(d,f);try{const s=fs.statSync(p);if(s.isDirectory()&&f!=='node_modules')r=r.concat(walk(p,depth+1,max));else if(/\.(fixture|factory|seed)\./.test(f)||f.startsWith('test-data'))r.push(p)}catch{}}}catch{}return r}const files=walk('.',0,4);console.log(files.length?files.join('\n'):'Không tìm thấy tệp dữ liệu kiểm thử')"`
 
 Faker.js availability:
 !`node -e "try{const p=require('./package.json');const d={...p.dependencies,...p.devDependencies};if(d['@faker-js/faker'])console.log('@faker-js/faker: '+d['@faker-js/faker']);else console.log('Faker.js: not installed')}catch{}" 2>/dev/null`
@@ -93,8 +94,8 @@ const data = require('./$output_file');
 Remove test data.
 
 ```bash
-# Delete generated files
-rm -f test-data/*.generated.json
+# Xóa tệp đã tạo (tương thích đa nền tảng)
+node -e "const fs=require('fs');const path=require('path');try{const dir='test-data';const files=fs.readdirSync(dir).filter(f=>f.endsWith('.generated.json'));files.forEach(f=>fs.unlinkSync(path.join(dir,f)));console.log('Đã xóa '+files.length+' tệp')}catch(e){console.log('Không tìm thấy tệp để xóa')}"
 
 # Or reset database
 npx prisma db push --force-reset

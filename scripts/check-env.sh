@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # check-env.sh - Verify test automation prerequisites
 # Usage: bash scripts/check-env.sh
-# Output: JSON with status of each tool
+# Output: Status of each tool with color-coded results
 
-set -e
+set -euo pipefail
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -17,11 +17,19 @@ WARN=0
 check_tool() {
     local name="$1"
     local cmd="$2"
-    local required="$3"
+    local required="${3:-optional}"
 
-    if version=$(eval "$cmd" 2>/dev/null | head -1); then
-        echo -e "  ${GREEN}✓${NC} ${name}: ${version}"
-        PASS=$((PASS + 1))
+    local version=""
+    # Use a subshell to safely capture output; avoid eval on untrusted input
+    if version=$(bash -c "$cmd" 2>/dev/null | head -1); then
+        if [ -n "$version" ]; then
+            echo -e "  ${GREEN}✓${NC} ${name}: ${version}"
+            PASS=$((PASS + 1))
+        else
+            # Command succeeded but no output — treat as found
+            echo -e "  ${GREEN}✓${NC} ${name}: (installed)"
+            PASS=$((PASS + 1))
+        fi
     else
         if [ "$required" = "required" ]; then
             echo -e "  ${RED}✗${NC} ${name}: not found"
@@ -47,8 +55,8 @@ check_tool "Java" "java --version 2>&1 | head -1" "required"
 echo ""
 echo "Android Tools:"
 check_tool "ADB" "adb version | head -1" "required"
-if [ -n "$ANDROID_HOME" ]; then
-    echo -e "  ${GREEN}✓${NC} ANDROID_HOME: $ANDROID_HOME"
+if [ -n "${ANDROID_HOME:-}" ]; then
+    echo -e "  ${GREEN}✓${NC} ANDROID_HOME: ${ANDROID_HOME}"
     PASS=$((PASS + 1))
 else
     echo -e "  ${RED}✗${NC} ANDROID_HOME: not set"
@@ -64,7 +72,7 @@ check_tool "k6" "k6 version" "optional"
 
 echo ""
 echo "iOS Tools (macOS only):"
-if [[ "$OSTYPE" == "darwin"* ]]; then
+if [[ "${OSTYPE:-unknown}" == "darwin"* ]]; then
     check_tool "Xcode" "xcodebuild -version | head -1" "optional"
     check_tool "ios-deploy" "ios-deploy --version" "optional"
     check_tool "idevice_id" "idevice_id --version 2>&1 | head -1" "optional"
@@ -76,7 +84,7 @@ echo ""
 echo "═══════════════════════════════════════════"
 echo -e "  Results: ${GREEN}${PASS} passed${NC}, ${RED}${FAIL} failed${NC}, ${YELLOW}${WARN} optional${NC}"
 
-if [ $FAIL -eq 0 ]; then
+if [ "$FAIL" -eq 0 ]; then
     echo -e "  ${GREEN}Environment is ready!${NC}"
 else
     echo -e "  ${RED}${FAIL} required tool(s) missing.${NC}"
@@ -90,4 +98,4 @@ fi
 echo "═══════════════════════════════════════════"
 echo ""
 
-exit $FAIL
+exit "$FAIL"

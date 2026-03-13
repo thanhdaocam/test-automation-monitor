@@ -1,13 +1,14 @@
 ---
 name: scaffold-test
-description: Create a new test project with proper structure, config files, and sample tests. Supports Playwright (web), WebdriverIO+Appium (mobile), and k6 (performance) templates. Use to quickly set up a new test project.
+version: 1.0.0
+description: Tạo dự án kiểm thử mới với cấu trúc chuẩn, tệp cấu hình và kiểm thử mẫu. Hỗ trợ Playwright (web), WebdriverIO+Appium (di động) và k6 (hiệu năng). Dùng để thiết lập nhanh dự án kiểm thử.
 allowed-tools: Bash(npm *), Bash(npx *), Bash(mkdir *), Bash(cp *), Bash(ls *), Bash(cat *), Write, Read, Glob
 user-invocable: true
 argument-hint: [web|mobile|performance|all] [--dir path]
 disable-model-invocation: true
 ---
 
-# Scaffold Test Project
+# Tạo khung dự án kiểm thử
 
 Create a new test project from templates with proper structure and configurations.
 

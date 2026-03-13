@@ -1,55 +1,71 @@
 # Test Automation Monitor
 
-Bộ **Claude Code Skills** toàn diện để monitor và quản lý automation test trên **Web**, **Mobile**, **API**, **Unit**, **Performance**, **Security**, **Visual** và nhiều hơn nữa — chạy trực tiếp trong Claude Code bằng slash commands.
+![Version](https://img.shields.io/badge/version-2.1.0-blue.svg)
+![Skills](https://img.shields.io/badge/skills-25-green.svg)
+![License](https://img.shields.io/badge/license-MIT-yellow.svg)
+![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)
+![Claude Code](https://img.shields.io/badge/Claude%20Code-Skills-purple.svg)
+
+A comprehensive set of **25 Claude Code Skills** (slash commands) for automation testing across **Web**, **Mobile**, **API**, **Unit**, **Performance**, **Security**, **Visual**, and more — run directly inside Claude Code.
+
+## What's New in v2.1
+
+- **Documentation overhaul**: CHANGELOG.md, CONTRIBUTING.md, auto-generated skills table
+- **Auto-docs script**: `node scripts/generate-docs.js` generates a skills reference table from SKILL.md frontmatter
+- **Cross-platform fixes**: PowerShell scripts alongside Bash for Windows compatibility
+- **Security hardening**: All skills use scoped `allowed-tools` (principle of least privilege)
+- **Contributor guide**: Step-by-step guide for creating new skills
+
+> See [CHANGELOG.md](CHANGELOG.md) for full version history.
 
 ## Features
 
-**24 slash commands** cho toàn bộ automation test workflow:
+**25 slash commands** covering the entire automation test workflow:
 
 ### Core Testing (v1.0)
 
-| Command | Mô tả |
-|---------|-------|
-| `/setup-test-env` | Kiểm tra & cài đặt Node.js, Java, ADB, Appium, Playwright, k6 |
-| `/devices` | List Android/iOS devices đang kết nối |
-| `/appium` | Start / stop / check status Appium server |
-| `/install-apk` | Cài APK lên Android device |
-| `/run-test` | Chạy Playwright hoặc k6 tests |
-| `/mobile-test` | Chạy WebdriverIO + Appium tests trên mobile |
-| `/test-report` | Xem kết quả test, thống kê pass/fail |
-| `/monitor` | Tổng quan status: devices, services, tests |
-| `/scaffold-test` | Tạo test project mới từ template |
+| Command | Description |
+|---------|-------------|
+| `/setup-test-env` | Check & install Node.js, Java, ADB, Appium, Playwright, k6 |
+| `/devices` | List connected Android/iOS devices and emulators |
+| `/appium` | Start / stop / check status of Appium server |
+| `/install-apk` | Install APK onto Android device or emulator |
+| `/run-test` | Run Playwright web tests or k6 performance tests |
+| `/mobile-test` | Run WebdriverIO + Appium tests on mobile devices |
+| `/test-report` | View test results with pass/fail statistics |
+| `/monitor` | System status dashboard: devices, services, tests |
+| `/scaffold-test` | Create new test project from templates |
 
-### Extended Testing (v2.0 - NEW)
+### Extended Testing (v2.0)
 
-| Command | Mô tả |
-|---------|-------|
-| `/api-test` | Chạy API/REST tests (Playwright request hoặc Supertest) |
-| `/unit-test` | Chạy unit tests (Vitest hoặc Jest) |
-| `/db-test` | Chạy database integration tests |
-| `/cypress-test` | Chạy Cypress E2E và component tests |
-| `/flutter-test` | Chạy Flutter unit, widget, integration tests |
-| `/rn-test` | Chạy React Native tests (Jest + Detox) |
-| `/visual-test` | Visual regression testing (screenshots comparison) |
+| Command | Description |
+|---------|-------------|
+| `/api-test` | Run API/REST tests (Playwright request or Supertest) |
+| `/unit-test` | Run unit tests (Vitest or Jest) |
+| `/db-test` | Run database integration tests |
+| `/cypress-test` | Run Cypress E2E and component tests |
+| `/flutter-test` | Run Flutter unit, widget, and integration tests |
+| `/rn-test` | Run React Native tests (Jest + Detox) |
+| `/visual-test` | Visual regression testing (screenshot comparison) |
 | `/contract-test` | Consumer-driven contract tests (Pact) |
 | `/smoke-test` | Quick post-deployment health checks |
 
-### Quality & Security (v2.0 - NEW)
+### Quality & Security (v2.0)
 
-| Command | Mô tả |
-|---------|-------|
+| Command | Description |
+|---------|-------------|
 | `/security-test` | Dependency audit, code analysis, OWASP Top 10 |
 | `/a11y-test` | Accessibility testing (WCAG 2.2, axe-core) |
 | `/lighthouse` | Google Lighthouse audit (performance, SEO, a11y) |
 
-### DevOps & Utilities (v2.0 - NEW)
+### DevOps & Utilities (v2.0)
 
-| Command | Mô tả |
-|---------|-------|
+| Command | Description |
+|---------|-------------|
 | `/ci-gen` | Generate CI/CD pipelines (GitHub Actions, GitLab, Jenkins, Azure) |
-| `/docker-test` | Quản lý Docker test environments |
-| `/notify` | Gửi test results tới Slack/Teams/Discord/Email |
-| `/test-data` | Generate, seed, manage test data (Faker.js) |
+| `/docker-test` | Manage Docker test environments |
+| `/notify` | Send test results to Slack/Teams/Discord/Email |
+| `/test-data` | Generate, seed, and manage test data (Faker.js) |
 
 ### Multi-Platform Support
 
@@ -74,45 +90,45 @@ Bộ **Claude Code Skills** toàn diện để monitor và quản lý automation
 git clone https://github.com/thanhdaocam/test-automation-monitor.git
 ```
 
-### 2. Copy skills vào project của bạn
+### 2. Copy skills into your project
 
 ```bash
-# Copy toàn bộ (skills + templates + scripts)
+# Copy everything (skills + templates + scripts)
 cp -r test-automation-monitor/.claude/ your-project/.claude/
 cp -r test-automation-monitor/scripts/ your-project/scripts/
 cp -r test-automation-monitor/templates/ your-project/templates/
 ```
 
-### 3. Mở Claude Code và dùng
+### 3. Open Claude Code and use
 
 ```bash
 cd your-project
 claude
 
-# Trong Claude Code:
-> /setup-test-env          # Kiểm tra environment
-> /scaffold-test all       # Tạo sample tests
-> /run-test                # Chạy web tests
-> /unit-test               # Chạy unit tests
-> /api-test                # Chạy API tests
-> /security-test           # Scan bảo mật
+# Inside Claude Code:
+> /setup-test-env          # Check environment
+> /scaffold-test all       # Create sample tests
+> /run-test                # Run web tests
+> /unit-test               # Run unit tests
+> /api-test                # Run API tests
+> /security-test           # Security scan
 > /lighthouse https://example.com  # Audit website
-> /monitor                 # Dashboard tổng quan
+> /monitor                 # Status dashboard
 ```
 
 ## Prerequisites
 
-### Bắt buộc
+### Required
 
 ```bash
 claude --version     # Claude Code
 node --version       # Node.js 20+
 ```
 
-### Tuỳ theo loại test
+### Per test type
 
-| Loại test | Cần cài |
-|-----------|---------|
+| Test Type | Requirements |
+|-----------|-------------|
 | Web (Playwright) | `npm install -D @playwright/test && npx playwright install` |
 | Web (Cypress) | `npm install -D cypress` |
 | Mobile (Android) | Java 11+, ADB, Appium 2.0, uiautomator2 driver |
@@ -128,13 +144,13 @@ node --version       # Node.js 20+
 | Accessibility | `@axe-core/playwright` |
 | Docker | Docker Desktop |
 
-Hoặc chạy `/setup-test-env` để tự động kiểm tra tất cả.
+Or run `/setup-test-env` to check everything automatically.
 
 ## Project Structure
 
 ```
 test-automation-monitor/
-├── .claude/skills/                    # 24 Claude Code Skills
+├── .claude/skills/                    # 25 Claude Code Skills
 │   ├── setup-test-env/SKILL.md       # Environment setup
 │   ├── devices/SKILL.md              # Device management
 │   ├── appium/SKILL.md               # Appium server
@@ -163,7 +179,10 @@ test-automation-monitor/
 │
 ├── scripts/                           # Helper scripts
 │   ├── check-env.sh
+│   ├── check-env.ps1                 # Windows PowerShell variant
+│   ├── generate-docs.js              # Auto-generate skills table
 │   ├── parse-playwright-results.sh
+│   ├── parse-playwright-results.ps1  # Windows PowerShell variant
 │   ├── parse-wdio-results.sh
 │   ├── parse-k6-results.sh
 │   ├── parse-api-results.sh
@@ -200,74 +219,104 @@ test-automation-monitor/
 │
 ├── CLAUDE.md                          # Project conventions
 ├── README.md                          # This file
+├── CHANGELOG.md                       # Version history (Keep a Changelog)
+├── CONTRIBUTING.md                    # Contributor guide
 ├── PLAN.md                            # Architecture decisions
 ├── TODO.md                            # Task tracking
 ├── INSTALL.md                         # Installation guide
 ├── SKILLS.md                          # Skills reference
+├── SKILLS-TABLE.md                    # Auto-generated skills table
 ├── USER-GUIDE.md                      # Detailed user guide
 └── AI-AGENT-GUIDE.md                  # AI agent routing guide
 ```
 
 ## Architecture
 
+The system uses a **Skills-as-Markdown** architecture: each skill is a `SKILL.md` file with YAML frontmatter and Markdown instructions. Claude Code reads the file, reasons about the context, and executes commands via its built-in tools.
+
 ```
-┌──────────────────────────────────────────────────────────┐
-│                    CLAUDE CODE                           │
-│                                                          │
-│  User: /run-test login.spec.ts                          │
-│       │                                                  │
-│       ▼                                                  │
-│  ┌─────────────┐                                        │
-│  │  SKILL.md   │  ← Prompt instructions                │
-│  └──────┬──────┘                                        │
-│         │                                                │
-│         ▼                                                │
-│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐  │
-│  │    Bash     │    │    Read     │    │    Grep     │  │
-│  │  (execute)  │    │  (results)  │    │  (search)   │  │
-│  └──────┬──────┘    └─────────────┘    └─────────────┘  │
-│         │                                                │
-└─────────┼────────────────────────────────────────────────┘
-          │
-          ▼
-┌──────────────────────────────────────────────────────────┐
-│                    TEST ENGINES                           │
-│                                                          │
-│  ┌──────────┐ ┌───────┐ ┌──────┐ ┌───────┐ ┌────────┐  │
-│  │Playwright│ │Cypress│ │Vitest│ │ Jest  │ │  k6    │  │
-│  └────┬─────┘ └───┬───┘ └──┬───┘ └───┬───┘ └───┬────┘  │
-│       │           │        │         │         │         │
-│  ┌────┴───┐  ┌────┴───┐   │    ┌────┴────┐    │         │
-│  │Browser │  │Browser │   │    │  Detox  │    │         │
-│  │ + API  │  │  E2E   │   │    │React Nat│    │         │
-│  └────────┘  └────────┘   │    └────┬────┘    │         │
-│                            │         │         │         │
-│  ┌──────────┐  ┌──────────┤    ┌────┴────┐    │         │
-│  │WebdriverIO│ │ Flutter  │    │ Appium  │    │         │
-│  └────┬─────┘  └────┬────┘    └────┬────┘    │         │
-│       │              │              │         │         │
-│  ┌────┴──────────────┴──────────────┴────┐    │         │
-│  │         Mobile Devices                │    │         │
-│  │    Android  |  iOS  |  WebView       │    │         │
-│  └───────────────────────────────────────┘    │         │
-│                                               │         │
-│  ┌─────────┐ ┌────────┐ ┌─────────┐ ┌───────┴──┐      │
-│  │axe-core │ │  Pact  │ │BackstopJS│ │HTTP Load│      │
-│  │  A11y   │ │Contract│ │ Visual  │ │ Testing │      │
-│  └─────────┘ └────────┘ └─────────┘ └──────────┘      │
-└──────────────────────────────────────────────────────────┘
+                           USER
+                            |
+                     /run-test login.spec.ts
+                            |
+                            v
++-----------------------------------------------------------+
+|                      CLAUDE CODE                          |
+|                                                           |
+|   .claude/skills/run-test/SKILL.md                       |
+|          |                                                |
+|          v                                                |
+|   +-------------+  +----------+  +--------+  +--------+  |
+|   |    Bash     |  |   Read   |  |  Grep  |  |  Glob  |  |
+|   |  (execute)  |  | (files)  |  |(search)|  | (find) |  |
+|   +------+------+  +----------+  +--------+  +--------+  |
+|          |                                                |
++----------+------------------------------------------------+
+           |
+           v
++-----------------------------------------------------------+
+|                     TEST ENGINES                          |
+|                                                           |
+|  +----------+ +-------+ +------+ +------+ +--------+     |
+|  |Playwright| |Cypress| |Vitest| | Jest | |   k6   |     |
+|  +----+-----+ +---+---+ +--+---+ +--+---+ +---+----+     |
+|       |            |        |        |         |          |
+|  +----+---+  +----+---+    |   +----+----+    |          |
+|  |Browser |  |Browser |    |   |  Detox  |    |          |
+|  | + API  |  |  E2E   |    |   |React Nat|    |          |
+|  +--------+  +--------+    |   +----+----+    |          |
+|                             |        |         |          |
+|  +-----------+ +---------+  |   +----+----+    |          |
+|  |WebdriverIO| | Flutter |  |   | Appium  |    |          |
+|  +-----+-----+ +----+----+  |   +----+----+    |          |
+|        |             |       |        |         |          |
+|  +-----+-------------+-------+--------+-+       |          |
+|  |           Mobile Devices              |       |          |
+|  |    Android  |  iOS  |  WebView       |       |          |
+|  +---------------------------------------+       |          |
+|                                                  |          |
+|  +---------+ +-------+ +---------+ +------------+          |
+|  |axe-core | | Pact  | |BackstopJ| | HTTP Load  |          |
+|  |  A11y   | |Contract| | Visual | |  Testing   |          |
+|  +---------+ +--------+ +--------+ +------------+          |
++-----------------------------------------------------------+
+```
+
+### How a Skill Executes
+
+```
+1. User types:     /run-test login.spec.ts --headed
+2. Claude loads:   .claude/skills/run-test/SKILL.md
+3. Dynamic context: !`commands` run to gather project info
+4. Claude reasons:  Detects Playwright, builds npx command
+5. Executes:        npx playwright test login.spec.ts --headed
+6. Parses output:   JSON results -> formatted pass/fail table
+7. Shows results:   Summary with counts, duration, failures
 ```
 
 ## Documentation
 
-| File | Nội dung |
-|------|----------|
-| [INSTALL.md](INSTALL.md) | Hướng dẫn cài đặt chi tiết |
-| [SKILLS.md](SKILLS.md) | Reference tất cả skills + arguments |
-| [USER-GUIDE.md](USER-GUIDE.md) | Hướng dẫn chi tiết từng test function |
-| [AI-AGENT-GUIDE.md](AI-AGENT-GUIDE.md) | Decision matrix cho AI agents |
-| [PLAN.md](PLAN.md) | Architecture & design decisions |
+| File | Description |
+|------|-------------|
+| [CHANGELOG.md](CHANGELOG.md) | Version history (v1.0 -> v2.0 -> v2.1) |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | How to create skills, PR guidelines |
+| [INSTALL.md](INSTALL.md) | Detailed installation guide |
+| [SKILLS.md](SKILLS.md) | Complete skills reference with arguments |
+| [SKILLS-TABLE.md](SKILLS-TABLE.md) | Auto-generated skills summary table |
+| [USER-GUIDE.md](USER-GUIDE.md) | Detailed usage guide for each skill |
+| [AI-AGENT-GUIDE.md](AI-AGENT-GUIDE.md) | Decision matrix for AI agent routing |
+| [PLAN.md](PLAN.md) | Architecture and design decisions |
 | [TODO.md](TODO.md) | Task tracking |
+
+### Auto-Generate Documentation
+
+```bash
+# Print skills table to stdout
+node scripts/generate-docs.js
+
+# Write to SKILLS-TABLE.md
+node scripts/generate-docs.js --output
+```
 
 ## License
 

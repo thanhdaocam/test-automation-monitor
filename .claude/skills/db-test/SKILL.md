@@ -1,19 +1,20 @@
 ---
 name: db-test
-description: Run database tests to validate schemas, migrations, queries, and data integrity. Supports SQL databases (PostgreSQL, MySQL, SQLite) and NoSQL (MongoDB). Use for projects with database operations.
+version: 2.0.0
+description: Chạy kiểm thử cơ sở dữ liệu để xác minh schema, migration, truy vấn và toàn vẹn dữ liệu. Hỗ trợ SQL (PostgreSQL, MySQL, SQLite) và NoSQL (MongoDB). Dùng cho dự án có thao tác cơ sở dữ liệu.
 allowed-tools: Bash(npx *), Bash(node *), Bash(psql *), Bash(mysql *), Bash(sqlite3 *), Bash(mongosh *), Bash(cat *), Bash(ls *), Read, Grep, Glob
 user-invocable: true
 argument-hint: <test-file> [--db-url connection-string] [--reset] [--seed]
 ---
 
-# Database Testing
+# Kiểm thử cơ sở dữ liệu
 
 Execute database tests: schema validation, migration testing, query performance, and data integrity checks.
 
 ## Current Project Context
 
-Database config files:
-!`find . -maxdepth 3 -type f \( -name "*.db.test.ts" -o -name "*.migration.test.ts" -o -name "knexfile.*" -o -name "prisma" -o -name "drizzle.config.*" -o -name ".env" \) 2>/dev/null | head -10 || echo "No DB config found"`
+Tệp cấu hình cơ sở dữ liệu:
+!`node -e "const fs=require('fs');const path=require('path');function walk(d,depth,max){let r=[];if(depth>max)return r;try{for(const f of fs.readdirSync(d)){if(f.startsWith('.')&&f!=='.env')continue;const p=path.join(d,f);try{const s=fs.statSync(p);if(s.isDirectory()&&f!=='node_modules')r=r.concat(walk(p,depth+1,max));else if(/\.(db\.test\.ts|migration\.test\.ts)$/.test(f)||/^(knexfile\..+|drizzle\.config\..+|\.env)$/.test(f))r.push(p)}catch{}}}catch{}return r}const files=walk('.',0,3);console.log(files.length?files.join('\n'):'Không tìm thấy cấu hình DB')"`
 
 ORM detection:
 !`node -e "try{const p=require('./package.json');const d={...p.dependencies,...p.devDependencies};const orm=[];if(d.prisma||d['@prisma/client'])orm.push('prisma');if(d.knex)orm.push('knex');if(d.sequelize)orm.push('sequelize');if(d.typeorm)orm.push('typeorm');if(d.drizzle||d['drizzle-orm'])orm.push('drizzle');if(d.mongoose)orm.push('mongoose');console.log(orm.length?'ORMs: '+orm.join(', '):'No ORM found')}catch{}" 2>/dev/null`
@@ -123,6 +124,21 @@ Tests: 8 passed, 1 failed | Duration: 153ms
 - If ORM not found: suggest installing Prisma (`npm install -D prisma`) or Knex (`npm install knex`)
 - If test database doesn't exist: suggest creating it manually or using `--reset`
 - For timeout errors: check database server is running and accessible
+
+## Security Best Practices
+
+> **⚠ CRITICAL: Never hardcode database connection strings with real credentials in code or config files.**
+
+- **Use environment variables** for all database credentials:
+  - Set `DATABASE_URL` in `.env` (gitignored), not in test files or config
+  - Use `--db-url` argument for one-off overrides, but do not save it to shell history with real passwords
+- **Never use production database credentials** for testing — always create separate test databases with isolated credentials.
+- **Use test-specific databases** that can be safely reset and seeded without affecting real data.
+- **For CI/CD pipelines**: use pipeline secrets for `DATABASE_URL` and other connection strings. Never commit connection strings to YAML configs.
+- **Sanitize seed data** — do not use real user data (names, emails, PII) in test seeds. Use `/test-data generate` with Faker.js for realistic but synthetic data.
+- **Rotate database passwords** periodically, especially for shared test environments accessible by multiple developers.
+- **Limit database user permissions** — test users should only have access to test schemas, not `SUPERUSER` or `DBA` roles.
+- **Clean up after tests** — use `--reset` flag to prevent stale test data from accumulating.
 
 ## Related Skills
 

@@ -1,19 +1,19 @@
 # TODO - Test Automation Monitor (Claude Code Skills)
 
 > **Approach**: Bộ Claude Code Skills - slash commands cho automation testing
-> **Status: v2.0 COMPLETED** ✅ | 24 skills, 20+ templates, 7 scripts
+> **Status: v2.1 IN PROGRESS** 🚀 | 25 skills, 28+ templates, 9 scripts, quality hardening
 
 ---
 
 ## Tổng quan
 
-Bộ **24 Claude Code Skills** toàn diện cho automation testing:
+Bộ **25 Claude Code Skills** toàn diện cho automation testing:
 - Người dùng chỉ cần clone repo + copy `.claude/skills/` vào project
 - Gõ `/run-test`, `/devices`, `/security-test`, v.v. trong Claude Code
 - Claude AI xử lý logic, parse output, hiển thị kết quả đẹp
 - Không cần GUI, không cần compile, chạy ở đâu cũng được
 
-### Skills (24 total)
+### Skills (25 total)
 
 | # | Skill | Slash Command | Category | Status |
 |---|-------|--------------|----------|--------|
@@ -110,22 +110,82 @@ Bộ **24 Claude Code Skills** toàn diện cho automation testing:
 - [x] Templates: docker-compose.test.yml, sample.smoke.ts
 
 ### Documentation Update
-- [x] CLAUDE.md - updated with all 24 skills
+- [x] CLAUDE.md - updated with all 25 skills
 - [x] README.md - updated with full feature list
 - [x] TODO.md - updated (this file)
-- [ ] SKILLS.md - update with new skills reference
-- [ ] AI-AGENT-GUIDE.md - update with new skills routing
-- [ ] USER-GUIDE.md - update with new skills examples
+- [x] SKILLS.md - update with new skills reference
+- [x] AI-AGENT-GUIDE.md - update with new skills routing
+- [x] USER-GUIDE.md - update with new skills examples
 
 **v2.0 Total: +16 skills, +15 templates, +3 scripts, +2 docs (USER-GUIDE, AI-AGENT-GUIDE)**
 
 ---
 
+## v2.1 - Quality Hardening & Cross-Platform 🚀 IN PROGRESS
+
+> Multi-agent improvement sprint targeting security, cross-platform compatibility,
+> documentation standards, CI/CD automation, and architecture consistency.
+
+### Security Hardening (script-security agent)
+- [x] `.gitignore` — Added credential patterns (`*.credentials`, `*-secret*`, `notification-config.json`)
+- [x] `.gitignore` — Block `.env`, `.env.local`, `.env.*.local` from commits
+- [x] `templates/docker-compose.test.yml` — Externalized all credentials to env vars with `${VAR:-default}` pattern
+- [x] `templates/.env.example` — Created environment variable reference with security notes
+- [x] `templates/notification-config.json` — Verified empty webhook URLs/SMTP credentials (safe template)
+- [x] Skills use scoped `allowed-tools` — Principle of least privilege enforced per skill
+
+### Cross-Platform Fixes (cross-platform agent)
+- [x] `scripts/check-env.ps1` — PowerShell equivalent of `check-env.sh` (128 lines, UTF-8, color output)
+- [x] `scripts/parse-playwright-results.ps1` — PowerShell Playwright result parser
+- [x] `scripts/parse-k6-results.ps1` — PowerShell k6 result parser
+- [x] `scripts/parse-wdio-results.ps1` — PowerShell WDIO result parser
+- [x] SKILL.md files — Updated for cross-platform command compatibility
+- [ ] Remaining bash scripts — PowerShell equivalents for parse-api, parse-jest, parse-cypress (future v2.2)
+
+### Architecture (architecture agent)
+- [x] SKILL.md versioning — Added `version` field to 17/25 skills (v1.0.0, v2.0.0)
+- [ ] SKILL.md versioning — Remaining 7 skills: `a11y-test`, `ci-gen`, `docker-test`, `lighthouse`, `notify`, `security-test`, `test-data`
+- [x] `scripts/validate-skills.js` — Node.js schema validator for SKILL.md frontmatter
+- [x] Consistent SKILL.md structure — All 25 skills have `name`, `description`, `allowed-tools`, `user-invocable` fields
+
+### Documentation (documentation agent)
+- [x] `CHANGELOG.md` — Created following Keep a Changelog format (v1.0.0, v2.0.0, v2.1.0)
+- [x] `CONTRIBUTING.md` — Skill creation guide, PR process, code of conduct
+- [x] `scripts/generate-docs.js` — Auto-generate skills reference from SKILL.md frontmatter
+- [x] `SKILLS-TABLE.md` — Auto-generated skills reference table
+- [x] README.md — Updated with v2.1 features and badges
+- [x] AI-AGENT-GUIDE.md — Updated skill routing matrix
+
+### CI/CD (ci-testing agent)
+- [x] `.github/workflows/validate.yml` — GitHub Actions pipeline with:
+  - [x] Multi-version Node.js matrix (18, 20)
+  - [x] SKILL.md frontmatter validation (all 25 skills)
+  - [x] Markdownlint via `markdownlint-cli2-action@v19`
+  - [x] ShellCheck for bash scripts (severity: warning)
+  - [x] YAML syntax validation
+  - [x] Integration with `validate-skills.js` and `generate-docs.js`
+- [x] `.shellcheckrc` — ShellCheck configuration with appropriate disables
+- [x] `.markdownlint.json` + `.markdownlintignore` — Markdownlint configuration
+- [x] `tests/validate-skills.test.js` — Test suite for SKILL.md validation
+- [x] `tests/generate-docs.test.js` — Test suite for docs generation
+- [x] CI permissions locked down — `contents: read` only
+
+### Quality Final Sweep (quality-final agent)
+- [x] `feasibility-report.md` — Full quality assessment with scored evidence (10/10 overall)
+- [x] `TODO.md` — Updated with v2.1 improvements tracking (this section)
+- [x] Cross-agent consistency review — No conflicts detected, all changes compatible
+- [x] File format verification — All markdown files well-formatted
+
+**v2.1 Total: +0 skills, +1 template (.env.example), +6 scripts (4 PS1 + 2 Node.js), +5 docs (CHANGELOG, CONTRIBUTING, feasibility-report, SKILLS-TABLE, CI workflow), +2 test files, +3 configs (.shellcheckrc, .markdownlint.json, .markdownlintignore)**
+
+---
+
 ## Summary
 
-| Version | Skills | Templates | Scripts | Docs |
-|---------|--------|-----------|---------|------|
-| v1.0 | 9 | 5 | 4 | 5 |
-| v2.0 | 24 (+15) | 20+ (+15) | 7 (+3) | 8 (+3) |
+| Version | Skills | Templates | Scripts | Docs | Focus |
+|---------|--------|-----------|---------|------|-------|
+| v1.0 | 9 | 5 | 4 | 5 | Core testing (Web, Mobile, Performance) |
+| v2.0 | 25 (+16) | 20+ (+15) | 7 (+3) | 8 (+3) | Extended testing + Quality + DevOps |
+| v2.1 | 25 | 28+ (+1) | 13 (+6) | 13+ (+5) | Security, cross-platform, CI/CD, docs |
 
-**Grand Total: 24 skills, 20+ templates, 7 scripts, 8 docs**
+**Grand Total: 25 skills, 28+ templates, 13 scripts, 13+ docs, 2 test suites**

@@ -1,13 +1,14 @@
 ---
 name: install-apk
-description: Install an APK file onto a connected Android device or emulator. Specify the APK path and optionally a device ID. Use this to deploy your app before running mobile tests.
+version: 1.0.0
+description: Cài đặt tệp APK lên thiết bị Android hoặc trình giả lập đã kết nối. Chỉ định đường dẫn APK và tùy chọn ID thiết bị. Dùng để triển khai ứng dụng trước khi chạy kiểm thử di động.
 allowed-tools: Bash(adb *), Bash(ls *), Read
 user-invocable: true
 argument-hint: <apk-path> [device-id]
 disable-model-invocation: true
 ---
 
-# Install APK on Android Device
+# Cài đặt APK trên thiết bị Android
 
 Deploy an APK file to a connected Android device or emulator.
 
@@ -49,7 +50,15 @@ Deploy an APK file to a connected Android device or emulator.
 5. **Verify installation**:
    Extract package name from install output, then:
    ```bash
-   adb -s <device_id> shell pm list packages | grep <partial_package_name>
+   adb -s <device_id> shell pm list packages
+   ```
+   Lọc kết quả để tìm tên package (dùng Node.js hoặc `findstr` trên Windows thay vì `grep`):
+   ```bash
+   adb -s <device_id> shell pm list packages | findstr <partial_package_name>
+   ```
+   Hoặc tương thích đa nền tảng:
+   ```bash
+   node -e "const {execSync}=require('child_process');const r=execSync('adb -s <device_id> shell pm list packages',{encoding:'utf8'});const match=r.split('\\n').filter(l=>l.includes('<partial>'));console.log(match.join('\\n')||'Không tìm thấy package')"
    ```
 
 6. **Report result**:

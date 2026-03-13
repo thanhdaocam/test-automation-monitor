@@ -1,22 +1,23 @@
 ---
 name: contract-test
-description: Run API contract tests using Pact for consumer-driven contracts. Validates that API providers and consumers agree on request/response formats. Use for microservices and API-first projects.
+version: 2.0.0
+description: Chạy kiểm thử hợp đồng API bằng Pact theo mô hình consumer-driven. Xác minh nhà cung cấp và người tiêu dùng API đồng ý về định dạng request/response. Dùng cho microservices và dự án API-first.
 allowed-tools: Bash(npx *), Bash(node *), Bash(cat *), Bash(ls *), Read, Grep, Glob
 user-invocable: true
 argument-hint: [test-file] [--provider] [--consumer] [--publish] [--broker-url url]
 ---
 
-# Contract Testing
+# Kiểm thử hợp đồng (Contract Testing)
 
 Run consumer-driven contract tests using Pact to ensure API compatibility between services.
 
 ## Current Project Context
 
-Contract test files:
-!`find . -maxdepth 4 -type f \( -name "*.pact.ts" -o -name "*.pact.js" -o -name "*.contract.ts" -o -name "*.contract.js" \) 2>/dev/null | head -10 || echo "No contract test files found"`
+Tệp kiểm thử contract:
+!`node -e "const fs=require('fs');const path=require('path');function walk(d,depth,max){let r=[];if(depth>max)return r;try{for(const f of fs.readdirSync(d)){if(f.startsWith('.'))continue;const p=path.join(d,f);try{const s=fs.statSync(p);if(s.isDirectory()&&f!=='node_modules')r=r.concat(walk(p,depth+1,max));else if(/\.(pact|contract)\.(ts|js)$/.test(f))r.push(p)}catch{}}}catch{}return r}const files=walk('.',0,4);console.log(files.length?files.join('\n'):'Không tìm thấy tệp kiểm thử contract')"`
 
-Pact files (existing contracts):
-!`find . -maxdepth 4 -type f -name "*.json" -path "*/pacts/*" 2>/dev/null | head -10 || echo "No pact files found"`
+Tệp Pact (contract hiện có):
+!`node -e "const fs=require('fs');const path=require('path');function walk(d,depth,max){let r=[];if(depth>max)return r;try{for(const f of fs.readdirSync(d)){if(f.startsWith('.'))continue;const p=path.join(d,f);try{const s=fs.statSync(p);if(s.isDirectory()&&f!=='node_modules')r=r.concat(walk(p,depth+1,max));else if(f.endsWith('.json')&&p.includes('pacts'))r.push(p)}catch{}}}catch{}return r}const files=walk('.',0,4);console.log(files.length?files.join('\n'):'Không tìm thấy tệp pact')"`
 
 Pact installation:
 !`node -e "try{const p=require('./package.json');const d={...p.dependencies,...p.devDependencies};if(d['@pact-foundation/pact'])console.log('Pact: '+d['@pact-foundation/pact']);else console.log('Pact: not installed')}catch{}" 2>/dev/null`

@@ -1,12 +1,13 @@
 ---
 name: cypress-test
-description: Run Cypress E2E and component tests. Auto-detects Cypress config and runs tests with formatted results. Use for projects using Cypress instead of Playwright for browser testing.
+version: 2.0.0
+description: Chạy kiểm thử E2E và component Cypress. Tự phát hiện cấu hình Cypress và chạy kiểm thử với kết quả có định dạng. Dùng cho dự án sử dụng Cypress thay vì Playwright.
 allowed-tools: Bash(npx *), Bash(node *), Bash(cat *), Bash(ls *), Read, Grep, Glob
 user-invocable: true
 argument-hint: [test-file-or-pattern] [--headed] [--browser chrome|firefox|edge] [--component] [--spec pattern]
 ---
 
-# Cypress Testing
+# Kiểm thử Cypress
 
 Execute Cypress E2E or component tests and display formatted results.
 
@@ -15,8 +16,8 @@ Execute Cypress E2E or component tests and display formatted results.
 Cypress config:
 !`ls cypress.config.ts cypress.config.js cypress.config.mjs 2>/dev/null || echo "No Cypress config found"`
 
-Cypress test files:
-!`find . -maxdepth 5 -type f \( -name "*.cy.ts" -o -name "*.cy.js" -o -name "*.cy.tsx" -o -name "*.cy.jsx" \) 2>/dev/null | head -15 || echo "No Cypress test files found"`
+Tệp kiểm thử Cypress:
+!`node -e "const fs=require('fs');const path=require('path');function walk(d,depth,max){let r=[];if(depth>max)return r;try{for(const f of fs.readdirSync(d)){if(f.startsWith('.'))continue;const p=path.join(d,f);try{const s=fs.statSync(p);if(s.isDirectory()&&f!=='node_modules')r=r.concat(walk(p,depth+1,max));else if(/\.cy\.(ts|js|tsx|jsx)$/.test(f))r.push(p)}catch{}}}catch{}return r}const files=walk('.',0,5);console.log(files.length?files.join('\n'):'Không tìm thấy tệp kiểm thử Cypress')"`
 
 ## Parse Arguments
 
@@ -76,9 +77,21 @@ npx cypress open
 
 Run the command and capture output. Parse JSON results:
 
+**macOS/Linux/Git Bash:**
 ```bash
 bash scripts/parse-cypress-results.sh test-results/cypress-results.json
 ```
+
+**Windows (PowerShell):**
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/parse-cypress-results.ps1 test-results/cypress-results.json
+```
+
+**Đa nền tảng (Node.js — khuyên dùng):**
+```bash
+node scripts/parse-cypress-results.sh test-results/cypress-results.json
+```
+> Lưu ý: Các script parse-*.sh đều sử dụng Node.js bên trong nên cũng tương thích khi chạy qua Git Bash trên Windows.
 
 ### 4. Display Results
 

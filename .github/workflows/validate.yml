@@ -1,0 +1,127 @@
+name: Validate Project
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate Skills, Tests & Lint
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18, 20]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: |
+          if [ -f package.json ]; then
+            npm ci --ignore-scripts || npm install --ignore-scripts
+          fi
+
+      - name: Validate SKILL.md files
+        run: |
+          echo "Checking all 25 skill directories have SKILL.md..."
+          EXPECTED_SKILLS=25
+          FOUND=0
+          MISSING=""
+          for dir in .claude/skills/*/; do
+            skill_name=$(basename "$dir")
+            if [ -f "${dir}SKILL.md" ]; then
+              FOUND=$((FOUND + 1))
+              # Validate frontmatter has required fields
+              if ! head -20 "${dir}SKILL.md" | grep -q "^name:"; then
+                echo "::warning::${dir}SKILL.md missing 'name' in frontmatter"
+              fi
+              if ! head -20 "${dir}SKILL.md" | grep -q "^description:"; then
+                echo "::warning::${dir}SKILL.md missing 'description' in frontmatter"
+              fi
+            else
+              MISSING="${MISSING} ${skill_name}"
+            fi
+          done
+          echo "Found ${FOUND}/${EXPECTED_SKILLS} SKILL.md files"
+          if [ -n "$MISSING" ]; then
+            echo "::error::Missing SKILL.md in:${MISSING}"
+            exit 1
+          fi
+          if [ "$FOUND" -lt "$EXPECTED_SKILLS" ]; then
+            echo "::error::Expected ${EXPECTED_SKILLS} skills, found ${FOUND}"
+            exit 1
+          fi
+          echo "All skill files validated successfully."
+
+      - name: Run project tests
+        run: |
+          if [ -f scripts/validate-skills.js ]; then
+            node scripts/validate-skills.js
+          else
+            echo "validate-skills.js not yet created, skipping"
+          fi
+          if [ -f scripts/generate-docs.js ]; then
+            node scripts/generate-docs.js --check
+          else
+            echo "generate-docs.js not yet created, skipping"
+          fi
+          # Run test suites
+          for test_file in tests/*.test.js; do
+            if [ -f "$test_file" ]; then
+              echo "Running ${test_file}..."
+              node "$test_file"
+            fi
+          done
+
+      - name: Markdownlint
+        uses: DavidAnson/markdownlint-cli2-action@v19
+        with:
+          globs: |
+            *.md
+            .claude/skills/**/SKILL.md
+
+      - name: Shellcheck
+        if: matrix.node-version == 18
+        uses: ludeeus/action-shellcheck@2.0.0
+        with:
+          scandir: ./scripts
+          additional_files: ""
+          severity: warning
+        env:
+          SHELLCHECK_OPTS: --source-path=scripts
+
+  yaml-lint:
+    name: Validate YAML
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate workflow YAML
+        run: |
+          echo "Checking YAML syntax..."
+          python3 -c "
+          import yaml, sys, glob
+          errors = 0
+          for f in glob.glob('.github/workflows/*.yml'):
+              try:
+                  with open(f) as fh:
+                      yaml.safe_load(fh)
+                  print(f'  OK: {f}')
+              except yaml.YAMLError as e:
+                  print(f'  FAIL: {f}: {e}')
+                  errors += 1
+          sys.exit(errors)
+          "
